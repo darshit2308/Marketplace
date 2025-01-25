@@ -12,3 +12,5 @@ docs/
 
 # Dotenv file
 .env
+
+circuits/node_modules
