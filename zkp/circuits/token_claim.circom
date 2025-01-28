@@ -4,20 +4,20 @@ include "../node_modules/circomlib/circuits/poseidon.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 
-template ContributionProof() {
+template TokenClaim() {
     // public
     signal input merkleRoot;
     signal input TREE_DEPTH;
 
     // private 
     signal input userAddress;
-    signal input contribution;
+    signal input numTokens;
     signal input path[TREE_DEPTH];
     signal input pathElements[TREE_DEPTH];
 
     component hasher = Poseidon(2);
     hasher.inputs[0] <== userAddress;
-    hasher.inputs[1] <== contribution;
+    hasher.inputs[1] <== numTokens;
     signal hashedLeaf <== hasher.out;
 
     signal output hasContributed;
@@ -45,4 +45,4 @@ template ContributionProof() {
     }
 }
 
-component main {public [merkleRoot, TREE_DEPTH]} = ContributionProof();
+component main {public [merkleRoot, TREE_DEPTH]} = TokenClaim();
