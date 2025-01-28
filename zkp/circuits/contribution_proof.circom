@@ -3,6 +3,7 @@ pragma circom 2.0.0;
 include "../node_modules/circomlib/circuits/poseidon.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
+include "./merkle_proof.circom";
 
 template ContributionProof() {
     // public
@@ -21,28 +22,19 @@ template ContributionProof() {
     signal hashedLeaf <== hasher.out;
 
     signal output hasContributed;
-    signal calculatedRoot <== CalculateMerkleRoot(hashedLeaf, pathElements, path, TREE_DEPTH);
-    component comparator = IsEqual();
+    component merkleProof = MerkleProof();
 
+    merkleProof.leaf <== hashedLeaf;
+    merkleProof.pathElements <== pathElements;
+    merkleProof.path <== path;
+    merkleProof.depth <== TREE_DEPTH;
+    signal calculatedRoot <== merkleProof.root;
+
+    component comparator = IsEqual();
     comparator.in[0] <== merkleRoot;
     comparator.in[1] <== calculatedRoot;
 
     hasContributed <== comparator.out;
-
-    function CalculateMerkleRoot(leaf, pathElements, path, depth) {
-        signal currentHash <== leaf;
-        
-        for (var i = 0; i < depth; i++) {
-            component levelHash = Poseidon(2);
-
-            levelHash.inputs[0] <== path[i] ? pathElements[i] : currentHash;
-            levelHash.inputs[1] <== path[i] ? currentHash : pathElements[i];
-
-            currentHash <== levelHash.out;
-        }
-
-        return currentHash;
-    }
 }
 
 component main {public [merkleRoot, TREE_DEPTH]} = ContributionProof();
