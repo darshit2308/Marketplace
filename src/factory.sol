@@ -36,14 +36,36 @@ contract Factory {
     function newInstance(
         string memory name,
         string memory symbol,
-        address tokenAddr
+        address tokenAddr,
+        uint256 totalSupply,
+        uint256 supportPeriod,
+        uint256 minSupportContrib,
+        uint256 maxSupportContrib,
+        uint256 minContrib,
+        uint256 maxContrib,
+        uint256 salePeriod,
+        uint256 maxSupporters
     ) public returns (address, address) {
-        Whitelist whitelist = new Whitelist(name, symbol, tokenAddr);
+        Whitelist whitelist = new Whitelist(
+            name,
+            symbol,
+            tokenAddr,
+            supportPeriod,
+            minSupportContrib,
+            maxSupportContrib,
+            maxSupporters
+        );
         Instance instance = new Instance(
             name,
             symbol,
             tokenAddr,
-            address(whitelist)
+            address(whitelist),
+            totalSupply,
+            minContrib,
+            maxContrib,
+            supportPeriod,
+            salePeriod,
+            msg.sender
         );
 
         InstanceParams memory params = InstanceParams({
