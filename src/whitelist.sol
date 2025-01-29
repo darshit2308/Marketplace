@@ -6,6 +6,7 @@ contract Whitelist {
     error Insufficient_Amount();
     error Exceeds_Contribution_Limit();
     error Supporter_Limit_Reached();
+    error Already_Contributed();
 
     string public NAME;
     string public SYMBOL;
@@ -20,6 +21,8 @@ contract Whitelist {
     uint256 public s_supporterCount;
 
     bytes32 private s_merkleRoot;
+
+    mapping(bytes32 addressHash => bool hasContributed) public s_contributed;
 
     constructor(
         string memory _name,
@@ -41,15 +44,23 @@ contract Whitelist {
         s_supporterCount = 0;
     }
 
-    function support(uint256 amount) public {
+    function support() public payable {
         if (block.timestamp > i_deadline) revert Deadline_Reached();
-        if (amount < i_minSupportContrib) revert Insufficient_Amount();
-        if (amount > i_maxSupportContrib) revert Exceeds_Contribution_Limit();
+        if (msg.value < i_minSupportContrib) revert Insufficient_Amount();
+        if (msg.value > i_maxSupportContrib)
+            revert Exceeds_Contribution_Limit();
         if (s_supporterCount == i_maxSupporters)
             revert Supporter_Limit_Reached();
 
+        bytes32 userHash = bytes32(keccak256(abi.encode(msg.sender)));
+        if (s_contributed[userHash]) revert Already_Contributed();
+        s_contributed[userHash] = true;
+
+        bytes32 contribHash = bytes32(
+            keccak256(abi.encodePacked(msg.sender, msg.value))
+        );
         bytes32 newRoot = bytes32(
-            keccak256(abi.encodePacked(s_merkleRoot, msg.sender))
+            keccak256(abi.encodePacked(s_merkleRoot, contribHash))
         );
         s_merkleRoot = newRoot;
         s_supporterCount++;
