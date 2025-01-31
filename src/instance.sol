@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// add onlyowner
+import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract Instance {
+contract Instance is Ownable {
     error Locked();
+    error Insufficient_Amount();
+    error Exceeds_Contribution_Limit();
+    error Already_Contributed();
 
     enum Status {
         LOCKED,
@@ -14,7 +17,6 @@ contract Instance {
     string public NAME;
     string public SYMBOL;
 
-    address private immutable owner;
     address private immutable i_tokenAddr;
     address private immutable i_whitelistAddr;
 
@@ -23,6 +25,9 @@ contract Instance {
     uint256 public immutable i_maxFee;
     uint256 public immutable i_launchTime;
     uint256 public immutable i_saleDeadline;
+
+    mapping(bytes32 contributerHash => bool hasContributed)
+        public s_contributers;
 
     Status public s_status;
 
@@ -37,7 +42,7 @@ contract Instance {
         uint256 _supportPeriod,
         uint256 _salePeriod,
         address _owner
-    ) {
+    ) Ownable(_owner) {
         NAME = _name;
         SYMBOL = _symbol;
         i_tokenAddr = _tokenAddr;
@@ -48,7 +53,6 @@ contract Instance {
         i_launchTime = block.timestamp + _supportPeriod;
         i_saleDeadline = i_launchTime + _salePeriod;
         s_status = Status.LOCKED;
-        owner = _owner;
     }
 
     modifier _unlocked() {
@@ -58,13 +62,22 @@ contract Instance {
         _;
     }
 
-    function lock() public /* onlyOwner */ _unlocked {
+    function lock() public onlyOwner _unlocked {
         s_status = Status.LOCKED;
     }
 
-    function unlock() public /* onlyOwner */ {
+    function unlock() public onlyOwner {
         if (block.timestamp > i_saleDeadline || block.timestamp < i_launchTime)
             revert();
         s_status = Status.UNLOCKED;
+    }
+
+    function conribute() external payable _unlocked {
+        if (msg.value < i_minFee) revert Insufficient_Amount();
+        if (msg.value > i_maxFee) revert Exceeds_Contribution_Limit();
+
+        bytes32 userHash = bytes32(keccak256(abi.encode(msg.sender)));
+        if (s_contributers[userHash]) revert Already_Contributed();
+        s_contributers[userHash] = true;
     }
 }

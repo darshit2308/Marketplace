@@ -55,14 +55,6 @@ contract Whitelist {
         bytes32 userHash = bytes32(keccak256(abi.encode(msg.sender)));
         if (s_contributed[userHash]) revert Already_Contributed();
         s_contributed[userHash] = true;
-
-        bytes32 contribHash = bytes32(
-            keccak256(abi.encodePacked(msg.sender, msg.value))
-        );
-        bytes32 newRoot = bytes32(
-            keccak256(abi.encodePacked(s_merkleRoot, contribHash))
-        );
-        s_merkleRoot = newRoot;
         s_supporterCount++;
     }
 }
