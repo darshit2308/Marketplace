@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-contract Whitelist {
+import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+
+contract Whitelist is Ownable {
     error Deadline_Reached();
-    error Insufficient_Amount();
-    error Exceeds_Contribution_Limit();
     error Supporter_Limit_Reached();
-    error Already_Contributed();
+    error Already_Registered();
+
+    event Registered(bytes32 commitment);
 
     string public NAME;
     string public SYMBOL;
@@ -22,7 +24,7 @@ contract Whitelist {
 
     bytes32 private s_merkleRoot;
 
-    mapping(bytes32 addressHash => bool hasContributed) public s_contributed;
+    mapping(bytes32 commitment => bool hasregistered) public s_registered;
 
     constructor(
         string memory _name,
@@ -31,8 +33,9 @@ contract Whitelist {
         uint256 _supportPeriod,
         uint256 _minSupportContrib,
         uint256 _maxSupportContrib,
-        uint256 _maxSupporters
-    ) {
+        uint256 _maxSupporters,
+        address _owner
+    ) Ownable(_owner) {
         NAME = _name;
         SYMBOL = _symbol;
         i_tokenAddr = _tokenAddr;
@@ -44,17 +47,16 @@ contract Whitelist {
         s_supporterCount = 0;
     }
 
-    function support() public payable {
+    function register(bytes32 _commitment) public onlyOwner returns (bool) {
         if (block.timestamp > i_deadline) revert Deadline_Reached();
-        if (msg.value < i_minSupportContrib) revert Insufficient_Amount();
-        if (msg.value > i_maxSupportContrib)
-            revert Exceeds_Contribution_Limit();
         if (s_supporterCount == i_maxSupporters)
             revert Supporter_Limit_Reached();
 
-        bytes32 userHash = bytes32(keccak256(abi.encode(msg.sender)));
-        if (s_contributed[userHash]) revert Already_Contributed();
-        s_contributed[userHash] = true;
+        if (s_registered[_commitment]) revert Already_Registered();
+        s_registered[_commitment] = true;
         s_supporterCount++;
+
+        emit Registered(_commitment);
+        return true;
     }
 }

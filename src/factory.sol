@@ -53,7 +53,8 @@ contract Factory {
             supportPeriod,
             minSupportContrib,
             maxSupportContrib,
-            maxSupporters
+            maxSupporters,
+            msg.sender
         );
         Instance instance = new Instance(
             name,

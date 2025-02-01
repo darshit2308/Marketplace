@@ -26,6 +26,8 @@ contract Instance is Ownable {
     uint256 public immutable i_launchTime;
     uint256 public immutable i_saleDeadline;
 
+    uint256 public s_totalContrib;
+
     mapping(bytes32 contributerHash => bool hasContributed)
         public s_contributers;
 
@@ -53,6 +55,7 @@ contract Instance is Ownable {
         i_launchTime = block.timestamp + _supportPeriod;
         i_saleDeadline = i_launchTime + _salePeriod;
         s_status = Status.LOCKED;
+        s_totalContrib = 0;
     }
 
     modifier _unlocked() {
@@ -72,12 +75,17 @@ contract Instance is Ownable {
         s_status = Status.UNLOCKED;
     }
 
-    function conribute() external payable _unlocked {
-        if (msg.value < i_minFee) revert Insufficient_Amount();
-        if (msg.value > i_maxFee) revert Exceeds_Contribution_Limit();
+    function _conribute(
+        bytes32 commitment,
+        uint256 amount
+    ) internal returns (bool) {
+        if (amount < i_minFee) revert Insufficient_Amount();
+        if (amount > i_maxFee) revert Exceeds_Contribution_Limit();
 
-        bytes32 userHash = bytes32(keccak256(abi.encode(msg.sender)));
-        if (s_contributers[userHash]) revert Already_Contributed();
-        s_contributers[userHash] = true;
+        if (s_contributers[commitment]) revert Already_Contributed();
+        s_contributers[commitment] = true;
+        s_totalContrib += amount;
+
+        return true;
     }
 }
