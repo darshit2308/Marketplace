@@ -26,7 +26,7 @@ contract Whitelist is Ownable {
 
     mapping(bytes32 commitment => bool hasregistered) public s_registered;
 
-    constructor(
+    constructor( 
         string memory _name,
         string memory _symbol,
         address _tokenAddr,
