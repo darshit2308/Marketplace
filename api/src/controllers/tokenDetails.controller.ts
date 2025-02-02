@@ -1,9 +1,31 @@
 import { Request, Response } from "express";
 import TokenDetails from "../models/user.model";
 
-// Controller function to add commitement to the leaves array
+// Controller function to add commitement to the whiteList array
 
-export const addLeaf = async (req , res) => {
+export const createToken = async (req: Request , res: Response) => {
+    try {
+        const {name , symbol} = req.body;
+
+        const whitelist: string[] = [];
+        const contributors: string[] = [];
+        
+        await TokenDetails.create({
+            name,
+            symbol,
+            whitelist,
+            contributors
+        });
+
+        res.send("Created successfully");
+    }
+    catch (error) {
+        res.status(500).json({message: "error creating.", error})
+    }
+};
+
+
+export const addInWhiteList = async (req: Request , res: Response) => {
     try {
         const {symbol , commitment} = req.body;
 
@@ -12,11 +34,15 @@ export const addLeaf = async (req , res) => {
 
         // Step 2: If the token details are not found, return an error
         if (!tokenDetails) {
-        return res.status(404).json({ message: 'Token details not found' });
+        res.status(404).json({ message: 'Token details not found' });
+        return;
         }
 
-        // Step 3: Add the commitment to the leaves array
-        tokenDetails.leaves.push(commitment);
+        // Step 3: Add the commitment to the whiteList array
+        //tokenDetails.whitelist.push(commitment);
+        let newWhitelist = tokenDetails.whitelist;
+        newWhitelist.push(commitment);
+        tokenDetails.whitelist = newWhitelist;
 
         // Step 4: Save the updated object back to the database
         await tokenDetails.save();
@@ -29,3 +55,4 @@ export const addLeaf = async (req , res) => {
         res.status(500).json({ message: 'Error adding commitment', error });
     }
 };
+

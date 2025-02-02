@@ -15,7 +15,8 @@ import * as bodyParser from 'body-parser';//  imports all exports from the body-
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import { addLeaf } from './controllers/tokenDetails.controller';
+import { addInWhiteList } from './controllers/tokenDetails.controller';
+import router from './routes/tokenRoutes';
 
 dotenv.config();
 
@@ -39,13 +40,12 @@ mongoose
 
 
 // Root route
+app.use('/api', router);
 app.get('/', (req,res) => { // Defins the server
   res.send("Hello from Darshit's Server");
 });
 
 // Add a commitment to the leaves array
-app.post('/addLeaf', addLeaf); // Use the addLeaf controller function
-
 // Note: If we remove bodyParser , the req.body becomes undefined .
 // Starts the server
 app.listen(port, () => { 
