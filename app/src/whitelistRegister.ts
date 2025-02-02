@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import dotenv from "dotenv";
 import axios from "axios";
+import buildPoseidonOpt from "circomlibjs";
 
 dotenv.config();
 
@@ -24,7 +25,10 @@ const register = async (userAddress: string, symbol: string) => {
     const whitelist = new web3.eth.Contract(whitelistAbi, whitelistAddr);
 
     const secret = process.env.SECRET!;
-    const commitment = web3.utils.soliditySha3(secret, userAddress);
+    const poseidon = await buildPoseidonOpt.buildPoseidonOpt();
+    const userHash = poseidon([userAddress]);
+    const secretHash = poseidon([secret]);
+    const commitment = poseidon.F.toString(poseidon([userHash, secretHash]));
 
     const tx = whitelist.methods.register(commitment);
     const txData = tx.encodeABI();
