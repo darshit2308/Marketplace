@@ -40,10 +40,6 @@ const tokenDetails = new Schema ({
     contributors: {
         type: [String],
         required: true
-    },
-    leaves: {
-        type: [String] ,
-        required: true
     }
 });
 
