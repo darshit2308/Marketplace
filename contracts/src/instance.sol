@@ -2,12 +2,18 @@
 pragma solidity ^0.8.20;
 
 import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {VerifyZKProof} from "./verifyZKProof.sol";
 
 contract Instance is Ownable {
+    event Contributed(bytes32 commitment, uint256 amount);
+    event Claimed(bytes32 commitment, bytes32 amount);
+
     error Locked();
     error Insufficient_Amount();
     error Exceeds_Contribution_Limit();
     error Already_Contributed();
+    error Already_Claimed();
+    error Contribution_Phase_Ongoing();
 
     enum Status {
         LOCKED,
@@ -28,8 +34,11 @@ contract Instance is Ownable {
 
     uint256 public s_totalContrib;
 
+    VerifyZKProof private immutable i_verifyZKProof;
+
     mapping(bytes32 contributerHash => bool hasContributed)
         public s_contributers;
+    mapping(bytes32 claimerHash => bool hasClaimed) public s_claimers;
 
     Status public s_status;
 
@@ -43,7 +52,8 @@ contract Instance is Ownable {
         uint256 _maxFee,
         uint256 _supportPeriod,
         uint256 _salePeriod,
-        address _owner
+        address _owner,
+        address _verifyZKProofAddr
     ) Ownable(_owner) {
         NAME = _name;
         SYMBOL = _symbol;
@@ -56,6 +66,7 @@ contract Instance is Ownable {
         i_saleDeadline = i_launchTime + _salePeriod;
         s_status = Status.LOCKED;
         s_totalContrib = 0;
+        i_verifyZKProof = VerifyZKProof(_verifyZKProofAddr);
     }
 
     modifier _unlocked() {
@@ -75,17 +86,54 @@ contract Instance is Ownable {
         s_status = Status.UNLOCKED;
     }
 
-    function _conribute(
+    function conribute(
         bytes32 commitment,
-        uint256 amount
-    ) internal returns (bool) {
+        uint256 amount,
+        uint256 attestationId,
+        bytes32[] calldata merklePath,
+        uint256 leafCount,
+        uint256 index
+    ) external payable onlyOwner _unlocked {
         if (amount < i_minFee) revert Insufficient_Amount();
         if (amount > i_maxFee) revert Exceeds_Contribution_Limit();
+        if (msg.value != amount) revert Insufficient_Amount();
 
         if (s_contributers[commitment]) revert Already_Contributed();
+        i_verifyZKProof.verifyZKProof(
+            attestationId,
+            merklePath,
+            leafCount,
+            index,
+            msg.sender
+        );
+
         s_contributers[commitment] = true;
         s_totalContrib += amount;
 
-        return true;
+        emit Contributed(commitment, amount);
+    }
+
+    function claim(
+        bytes32 commitment,
+        bytes32 amount,
+        uint256 attestationId,
+        bytes32[] calldata merklePath,
+        uint256 leafCount,
+        uint256 index
+    ) external onlyOwner {
+        if (s_status == Status.UNLOCKED) revert Contribution_Phase_Ongoing();
+        if (s_claimers[commitment]) revert Already_Claimed();
+
+        i_verifyZKProof.verifyZKProof(
+            attestationId,
+            merklePath,
+            leafCount,
+            index,
+            msg.sender
+        );
+
+        s_claimers[commitment] = true;
+
+        emit Claimed(commitment, amount);
     }
 }
