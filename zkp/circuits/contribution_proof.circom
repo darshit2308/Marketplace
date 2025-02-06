@@ -14,7 +14,6 @@ template ContributionProof() {
     signal input userAddress;
     signal input contribution;
     signal input path[TREE_DEPTH];
-    signal input pathElements[TREE_DEPTH];
 
     component hasher = Poseidon(2);
     hasher.inputs[0] <== userAddress;
@@ -25,9 +24,8 @@ template ContributionProof() {
     component merkleProof = MerkleProof();
 
     merkleProof.leaf <== hashedLeaf;
-    merkleProof.pathElements <== pathElements;
-    merkleProof.path <== path;
     merkleProof.depth <== TREE_DEPTH;
+    merkleProof.path <== path;
     signal calculatedRoot <== merkleProof.root;
 
     component comparator = IsEqual();

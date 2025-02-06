@@ -12,7 +12,6 @@ template WhitelistVerification() {
 
     // private
     signal input path[TREE_DEPTH];
-    signal input pathElements[TREE_DEPTH];
     signal input userAddress;
 
     signal output isIncluded;
@@ -23,7 +22,6 @@ template WhitelistVerification() {
 
     component merkleProof = MerkleProof();
     merkleProof.leaf <== hashedLeaf;
-    merkleProof.pathElements <== pathElements;
     merkleProof.path <== path;
     merkleProof.depth <== TREE_DEPTH;
     signal calculatedRoot <== merkleProof.root;

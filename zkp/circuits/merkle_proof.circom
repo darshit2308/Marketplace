@@ -6,9 +6,8 @@ include "../node_modules/circomlib/circuits/comparators.circom";
 
 template MerkleProof() {
     signal input leaf;
-    signal input pathElements;
-    signal input path;
     signal input depth;
+    signal input path[depth];
 
     signal output root;
     signal currentHash <== leaf;
@@ -16,8 +15,8 @@ template MerkleProof() {
     for (var i = 0; i < depth; i++) {
         component levelHash = Poseidon(2);
 
-        levelHash.inputs[0] <== path[i] ? pathElements[i] : currentHash;
-        levelHash.inputs[1] <== path[i] ? currentHash : pathElements[i];
+        levelHash.inputs[0] <== currentHash;
+        levelHash.inputs[1] <== path[i];
 
         currentHash <== levelHash.out;
     }

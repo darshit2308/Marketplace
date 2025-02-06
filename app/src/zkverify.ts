@@ -1,6 +1,7 @@
 import { ZkVerifyEvents, zkVerifySession } from "zkverifyjs";
 import { Groth16Proof, PublicSignals } from "snarkjs";
 import { ethers } from "ethers";
+import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -113,7 +114,7 @@ const zkVerifyAndCallMethod = async (
     });
   }
 
-  if (method == "comtribute") {
+  if (method == "contribute") {
     zkvContract.once(filterAttestationsById, async (_id, _root) => {
       const txResponse = await appContract.contribute(
         commitment,
@@ -132,6 +133,9 @@ const zkVerifyAndCallMethod = async (
       amount
     );
     appContract.once(filterAppEventsByCaller, async () => {
+      const url = "";
+      await axios.post(url);
+
       console.log(
         `Whitelist inclusion has been proved and contribution of amount ${amount} has been made`
       );
