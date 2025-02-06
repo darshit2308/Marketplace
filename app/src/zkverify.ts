@@ -5,11 +5,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const zkVerifyWhitelist = async (
+const zkVerifyAndCallMethod = async (
   proof: Groth16Proof,
   publicSignals: PublicSignals,
   commitment: string,
-  amount: number
+  amount: number,
+  method: string,
+  contractAddr: string,
+  contractABI: string[]
 ) => {
   const {
     ZKV_RPC_URL,
@@ -17,7 +20,6 @@ export const zkVerifyWhitelist = async (
     ETH_RPC_URL,
     ETH_SECRET_KEY,
     ETH_ZKVERIFY_CONTRACT_ADDRESS,
-    ETH_APP_CONTRACT_ADDRESS,
   } = process.env;
 
   const vk = "";
@@ -68,9 +70,6 @@ export const zkVerifyWhitelist = async (
   const zkvABI = [
     "event AttestationPosted(uint256 indexed attestationId, bytes32 indexed root)",
   ];
-  const appContractABI = [
-    "function contribute(bytes32 commitment,bytes32 amount,uint256 attestationId,bytes32[] calldata merklePath,uint256 leafCount,uint256 index), event Contributed(bytes32 commitment, uint256 amount);",
-  ];
 
   const provider = new ethers.JsonRpcProvider(ETH_RPC_URL, undefined, {
     polling: true,
@@ -82,36 +81,62 @@ export const zkVerifyWhitelist = async (
     zkvABI,
     provider
   );
-  const appContract = new ethers.Contract(
-    ETH_APP_CONTRACT_ADDRESS!,
-    appContractABI,
-    wallet
-  );
+  const appContract = new ethers.Contract(contractAddr, contractABI, wallet);
 
   const filterAttestationsById = zkvContract.filters.AttestationPosted(
     attestationId,
     null
   );
-  zkvContract.once(filterAttestationsById, async (_id, _root) => {
-    const txResponse = await appContract.contribute(
-      commitment,
-      amount,
-      attestationId,
-      merkleProof,
-      numberOfLeaves,
-      leafIndex
-    );
-    const { hash } = await txResponse;
-    console.log(`Tx sent to EVM, tx-hash ${hash}`);
-  });
 
-  const filterAppEventsByCaller = appContract.filters.Contributed(
-    commitment,
-    amount
-  );
-  appContract.once(filterAppEventsByCaller, async () => {
-    console.log(
-      `Whitelist inclusion has been proved and contribution of amount ${amount} has been made`
+  if (method == "cliam") {
+    zkvContract.once(filterAttestationsById, async (_id, _root) => {
+      const txResponse = await appContract.claim(
+        commitment,
+        amount,
+        attestationId,
+        merkleProof,
+        numberOfLeaves,
+        leafIndex
+      );
+      const { hash } = await txResponse;
+      console.log(`Tx sent to EVM, tx-hash ${hash}`);
+    });
+
+    const filterAppEventsByCaller = appContract.filters.Claimed(
+      commitment,
+      amount
     );
-  });
+    appContract.once(filterAppEventsByCaller, async () => {
+      console.log(
+        `${amount} token(s) have been cliamed by user with commitment ${commitment}`
+      );
+    });
+  }
+
+  if (method == "comtribute") {
+    zkvContract.once(filterAttestationsById, async (_id, _root) => {
+      const txResponse = await appContract.contribute(
+        commitment,
+        amount,
+        attestationId,
+        merkleProof,
+        numberOfLeaves,
+        leafIndex
+      );
+      const { hash } = await txResponse;
+      console.log(`Tx sent to EVM, tx-hash ${hash}`);
+    });
+
+    const filterAppEventsByCaller = appContract.filters.Contributed(
+      commitment,
+      amount
+    );
+    appContract.once(filterAppEventsByCaller, async () => {
+      console.log(
+        `Whitelist inclusion has been proved and contribution of amount ${amount} has been made`
+      );
+    });
+  }
 };
+
+export default zkVerifyAndCallMethod;
