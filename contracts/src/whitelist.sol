@@ -4,12 +4,15 @@ pragma solidity ^0.8.20;
 import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 contract Whitelist is Ownable {
+    // custom errors
     error Deadline_Reached();
     error Supporter_Limit_Reached();
     error Already_Registered();
 
+    // events
     event Registered(bytes32 commitment);
 
+    // state variables
     string public NAME;
     string public SYMBOL;
 
@@ -41,6 +44,12 @@ contract Whitelist is Ownable {
         s_supporterCount = 0;
     }
 
+    /**
+     * @dev Registers a supporter
+     * @param _commitment Commitment hash of the supporter, which is calculated by hashing the user's address hash with a secret string
+     * NOTE: 1. This function can only be called by the owner, to prevent the user's address from getting leaked or traced
+     *       2. The supporter can only register if the deadline has not been reached and the supporter limit has not been reached
+     */
     function register(bytes32 _commitment) public onlyOwner returns (bool) {
         if (block.timestamp > i_deadline) revert Deadline_Reached();
         if (s_supporterCount == i_maxSupporters)

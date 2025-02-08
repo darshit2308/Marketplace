@@ -5,13 +5,13 @@ include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "./merkle_proof.circom";
 
-template WhitelistVerification() {
+template WhitelistVerification(MAX_DEPTH) {
     // public
     signal input merkleRoot;
     signal input TREE_DEPTH;
 
     // private
-    signal input path[TREE_DEPTH];
+    signal input path[MAX_DEPTH];
     signal input userAddress;
 
     signal output isIncluded;
@@ -33,4 +33,4 @@ template WhitelistVerification() {
     isIncluded <== rootComparator.out;
 }
 
-component main {public [merkleRoot, TREE_DEPTH]} = WhitelistVerification();
+component main {public [merkleRoot, TREE_DEPTH]} = WhitelistVerification(32);

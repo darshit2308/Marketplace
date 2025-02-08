@@ -4,21 +4,21 @@ include "../node_modules/circomlib/circuits/poseidon.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 
-template MerkleProof() {
+template MerkleProof(MAX_DEPTH) {
     signal input leaf;
+    signal input path[MAX_DEPTH];
     signal input depth;
-    signal input path[depth];
 
     signal output root;
     signal currentHash <== leaf;
         
-    for (var i = 0; i < depth; i++) {
+    for (var i = 0; i < MAX_DEPTH; i++) {
         component levelHash = Poseidon(2);
 
         levelHash.inputs[0] <== currentHash;
         levelHash.inputs[1] <== path[i];
 
-        currentHash <== levelHash.out;
+        currentHash <== ((i < depth) * levelHash.out) + ((i >= depth) * currentHash);
     }
 
     root <== currentHash;
