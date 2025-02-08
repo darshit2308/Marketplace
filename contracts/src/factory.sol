@@ -1,4 +1,6 @@
+// Token creation
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.20;
 
 import {Whitelist} from "./whitelist.sol";
@@ -38,13 +40,13 @@ contract Factory {
         string memory symbol,
         address tokenAddr,
         uint256 totalSupply,
-        uint256 supportPeriod,
+        uint256 supportPeriod, // whitelist period
         uint256 minSupportContrib,
         uint256 maxSupportContrib,
         uint256 minContrib,
         uint256 maxContrib,
         uint256 salePeriod,
-        uint256 maxSupporters
+        uint256 maxSupporters // number of people who can register
     ) public returns (address, address) {
         Whitelist whitelist = new Whitelist(
             name,

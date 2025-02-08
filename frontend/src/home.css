@@ -1,0 +1,78 @@
+* {
+  margin: 0rem;
+  padding: 0rem;
+}
+.background{
+  position: absolute;
+  top: 0rem;
+  width: 100%;
+  z-index: 0.1;
+  background-image:linear-gradient(to top, rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%),url("../images/blockchain\ 08-02-2025\ at\ 02-49-38.jpeg");
+  height: 80vh;
+  background-size: cover; /* Ensures the image covers the entire container */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  color: white;
+}
+.navigation ul {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  list-style: none;
+  
+}
+.navigation a {
+  margin-right: 3rem;
+  color: white;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 1.5rem;
+}
+.navigation li {
+  margin-top: 0.7rem;
+  margin-left: 1rem;
+}
+.navigation li:hover {
+  opacity: 0.9;
+}
+.register {
+  width: 17rem;
+  height: 7rem;
+  position: relative;
+  z-index: inherit;
+  left: 44rem;
+  top: 33rem;
+  border-radius: 40px;
+  font-size: 2rem;
+}
+.register {
+  width: 9em;
+  height: 3em;
+  border-radius: 30em;
+  font-size: 15px;
+  font-family: inherit;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 6px 6px 12px #c5c5c5,
+              -6px -6px 12px #ffffff;
+ }
+ 
+ .register::before {
+  content: '';
+  width: 0;
+  height: 3em;
+  border-radius: 30em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(to right, #0fd850 0%, #f9f047 100%);
+  transition: .5s ease;
+  display: block;
+  z-index: -1;
+ }
+ 
+ .register:hover::before {
+  width: 9em;
+ }
