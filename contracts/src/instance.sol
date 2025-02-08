@@ -5,15 +5,17 @@ import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.so
 import {VerifyZKProof} from "./verifyZKProof.sol";
 
 contract Instance is Ownable {
-    event Contributed(bytes32 commitment, uint256 amount);
-    event Claimed(bytes32 commitment, bytes32 amount);
-
     error Locked();
     error Insufficient_Amount();
     error Exceeds_Contribution_Limit();
     error Already_Contributed();
     error Already_Claimed();
     error Contribution_Phase_Ongoing();
+    error Reached_Deadline();
+    error Not_Reached_Launch_Time();
+
+    event Contributed(bytes32 commitment, uint256 amount);
+    event Claimed(bytes32 commitment, bytes32 amount);
 
     enum Status {
         LOCKED,
@@ -64,7 +66,7 @@ contract Instance is Ownable {
         i_maxFee = _maxFee;
         i_launchTime = block.timestamp + _supportPeriod;
         i_saleDeadline = i_launchTime + _salePeriod;
-        s_status = Status.LOCKED;
+        s_status = Status.UNLOCKED;
         s_totalContrib = 0;
         i_verifyZKProof = VerifyZKProof(_verifyZKProofAddr);
     }
@@ -81,8 +83,8 @@ contract Instance is Ownable {
     }
 
     function unlock() public onlyOwner {
-        if (block.timestamp > i_saleDeadline || block.timestamp < i_launchTime)
-            revert();
+        if (block.timestamp > i_saleDeadline) revert Reached_Deadline();
+        if (block.timestamp < i_launchTime) revert Not_Reached_Launch_Time();
         s_status = Status.UNLOCKED;
     }
 
@@ -121,7 +123,9 @@ contract Instance is Ownable {
         uint256 leafCount,
         uint256 index
     ) external onlyOwner {
-        if (s_status == Status.UNLOCKED) revert Contribution_Phase_Ongoing();
+        if (block.timestamp < i_launchTime) revert Not_Reached_Launch_Time();
+        if (block.timestamp < i_saleDeadline)
+            revert Contribution_Phase_Ongoing();
         if (s_claimers[commitment]) revert Already_Claimed();
 
         i_verifyZKProof.verifyZKProof(

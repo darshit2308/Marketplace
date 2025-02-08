@@ -40,6 +40,7 @@ contract Factory {
         string memory symbol,
         address tokenAddr,
         uint256 totalSupply,
+<<<<<<< HEAD
         uint256 supportPeriod, // whitelist period
         uint256 minSupportContrib,
         uint256 maxSupportContrib,
@@ -47,15 +48,20 @@ contract Factory {
         uint256 maxContrib,
         uint256 salePeriod,
         uint256 maxSupporters // number of people who can register
+=======
+        uint256 supportPeriod,
+        uint256 minContrib,
+        uint256 maxContrib,
+        uint256 salePeriod,
+        address zkVerifyAddr
+>>>>>>> e018ece305a943e33fed263ea8e274617eadc113
     ) public returns (address, address) {
         Whitelist whitelist = new Whitelist(
             name,
             symbol,
             tokenAddr,
             supportPeriod,
-            minSupportContrib,
-            maxSupportContrib,
-            maxSupporters,
+            totalSupply / maxContrib,
             msg.sender
         );
         Instance instance = new Instance(
@@ -68,7 +74,8 @@ contract Factory {
             maxContrib,
             supportPeriod,
             salePeriod,
-            msg.sender
+            msg.sender,
+            zkVerifyAddr
         );
 
         InstanceParams memory params = InstanceParams({

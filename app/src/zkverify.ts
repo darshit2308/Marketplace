@@ -1,6 +1,7 @@
 import { ZkVerifyEvents, zkVerifySession } from "zkverifyjs";
 import { Groth16Proof, PublicSignals } from "snarkjs";
 import { ethers } from "ethers";
+import { buildPoseidonOpt } from "circomlibjs";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -20,7 +21,7 @@ const zkVerifyAndCallMethod = async (
     ZKV_SEED_PHRASE,
     ETH_RPC_URL,
     ETH_SECRET_KEY,
-    ETH_ZKVERIFY_CONTRACT_ADDRESS,
+    ZKVERIFY_CONTRACT_ADDRESS,
   } = process.env;
 
   const vk = "";
@@ -78,7 +79,7 @@ const zkVerifyAndCallMethod = async (
   const wallet = new ethers.Wallet(ETH_SECRET_KEY!, provider);
 
   const zkvContract = new ethers.Contract(
-    ETH_ZKVERIFY_CONTRACT_ADDRESS!,
+    ZKVERIFY_CONTRACT_ADDRESS!,
     zkvABI,
     provider
   );
@@ -134,8 +135,11 @@ const zkVerifyAndCallMethod = async (
     );
     appContract.once(filterAppEventsByCaller, async () => {
       const url = "";
-      await axios.post(url);
+      const poseidon = await buildPoseidonOpt();
+      const hash = poseidon([commitment, amount]);
+      const body = { hash };
 
+      await axios.post(url, body);
       console.log(
         `Whitelist inclusion has been proved and contribution of amount ${amount} has been made`
       );

@@ -16,8 +16,6 @@ contract Whitelist is Ownable {
     address private immutable i_tokenAddr;
 
     uint256 public immutable i_deadline;
-    uint256 public immutable i_minSupportContrib;
-    uint256 public immutable i_maxSupportContrib;
     uint256 public immutable i_maxSupporters;
 
     uint256 public s_supporterCount;
@@ -26,13 +24,11 @@ contract Whitelist is Ownable {
 
     mapping(bytes32 commitment => bool hasregistered) public s_registered;
 
-    constructor( 
+    constructor(
         string memory _name,
         string memory _symbol,
         address _tokenAddr,
         uint256 _supportPeriod,
-        uint256 _minSupportContrib,
-        uint256 _maxSupportContrib,
         uint256 _maxSupporters,
         address _owner
     ) Ownable(_owner) {
@@ -40,8 +36,6 @@ contract Whitelist is Ownable {
         SYMBOL = _symbol;
         i_tokenAddr = _tokenAddr;
         i_deadline = block.timestamp + _supportPeriod;
-        i_minSupportContrib = _minSupportContrib;
-        i_maxSupportContrib = _maxSupportContrib;
         s_merkleRoot = bytes32("");
         i_maxSupporters = _maxSupporters;
         s_supporterCount = 0;
@@ -58,5 +52,9 @@ contract Whitelist is Ownable {
 
         emit Registered(_commitment);
         return true;
+    }
+
+    function getMaxSupporters() public view returns (uint256) {
+        return i_maxSupporters;
     }
 }
