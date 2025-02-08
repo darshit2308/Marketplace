@@ -39,21 +39,17 @@ contract Factory {
         address tokenAddr,
         uint256 totalSupply,
         uint256 supportPeriod,
-        uint256 minSupportContrib,
-        uint256 maxSupportContrib,
         uint256 minContrib,
         uint256 maxContrib,
         uint256 salePeriod,
-        uint256 maxSupporters
+        address zkVerifyAddr
     ) public returns (address, address) {
         Whitelist whitelist = new Whitelist(
             name,
             symbol,
             tokenAddr,
             supportPeriod,
-            minSupportContrib,
-            maxSupportContrib,
-            maxSupporters,
+            totalSupply / maxContrib,
             msg.sender
         );
         Instance instance = new Instance(
@@ -66,7 +62,8 @@ contract Factory {
             maxContrib,
             supportPeriod,
             salePeriod,
-            msg.sender
+            msg.sender,
+            zkVerifyAddr
         );
 
         InstanceParams memory params = InstanceParams({

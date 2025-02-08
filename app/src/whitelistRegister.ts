@@ -58,7 +58,8 @@ const register = async (userAddress: string, symbol: string) => {
       if (event) {
         console.log("User registered:", event.returnValues);
         const apiUrl = "";
-        await axios.post(apiUrl); // post method to add the user commitment to the merkle tree in the database
+        const body = { commitment };
+        await axios.post(apiUrl, body); // post method to add the user commitment to the merkle tree in the database
       }
     }
   } catch (error) {

@@ -6,16 +6,16 @@
 
 import zkVerifyAndCallMethod from "./zkverify";
 import axios from "axios";
-import { generateProofWhitelist } from "./generateProof";
+import {
+  generateProofWhitelist,
+  generateProofContribution,
+} from "./generateProof";
 import { getProof, getRoot } from "./merkleTree";
 import buildPoseidonOpt from "circomlibjs";
 import dotenv from "dotenv";
+import { Groth16Proof, PublicSignals } from "snarkjs";
 
 dotenv.config();
-
-interface IAxiosResponse {
-  leaves: string[];
-}
 
 const callMethod = async (
   amount: number,
@@ -33,17 +33,33 @@ const callMethod = async (
   const commitment = poseidon.F.toString(poseidon([userHash, secretHash]));
 
   const url = "";
-  const data = (await axios.get(url)) as IAxiosResponse;
-  const leaves = data.leaves;
+  const res = await axios.get(url);
+  const leaves = res.data.leaves;
 
   const merkeleproof = getProof(leaves, commitment);
   const merkleRoot = getRoot(leaves);
 
-  const { proof, publicSignals } = await generateProofWhitelist(
-    commitment,
-    merkeleproof,
-    merkleRoot
-  );
+  let proof: Groth16Proof, publicSignals: PublicSignals;
+
+  if (method == "contribute") {
+    const res = await generateProofWhitelist(
+      commitment,
+      merkeleproof,
+      merkleRoot
+    );
+    proof = res.proof;
+    publicSignals = res.publicSignals;
+  } else {
+    const res = await generateProofContribution(
+      commitment,
+      merkeleproof,
+      merkleRoot,
+      amount
+    );
+    proof = res.proof;
+    publicSignals = res.publicSignals;
+  }
+
   zkVerifyAndCallMethod(
     proof,
     publicSignals,
