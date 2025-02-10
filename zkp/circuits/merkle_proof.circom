@@ -1,25 +1,49 @@
+// Credit Sismo: https://github.com/sismo-core/hydra-s1-zkps/blob/main/circuits/common/verify-merkle-path.circom
+// Highly inspired from tornado cash https://github.com/tornadocash/tornado-core/tree/master/circuits
 pragma circom 2.0.0;
 
 include "../node_modules/circomlib/circuits/poseidon.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 
-template MerkleProof(MAX_DEPTH) {
+// if s == 0 returns [in[0], in[1]]
+// if s == 1 returns [in[1], in[0]]
+template PositionSwitcher() {
+    signal input in[2];
+    signal input s;
+    signal output out[2];
+
+    s * (1 - s) === 0;
+    out[0] <== (in[1] - in[0])*s + in[0];
+    out[1] <== (in[0] - in[1])*s + in[1];
+}
+
+
+// Verifies that merkle path is correct for a given merkle root and leaf
+// pathIndices input is an array of 0/1 selectors telling whether given 
+// pathElement is on the left or right side of merkle path
+template VerifyMerklePath(levels) {
     signal input leaf;
-    signal input path[MAX_DEPTH];
-    signal input depth;
-
     signal output root;
-    signal currentHash <== leaf;
-        
-    for (var i = 0; i < MAX_DEPTH; i++) {
-        component levelHash = Poseidon(2);
+    signal input pathElements[levels];
+    signal input pathIndices[levels];
 
-        levelHash.inputs[0] <== currentHash;
-        levelHash.inputs[1] <== path[i];
+    component selectors[levels];
+    component hashers[levels];
 
-        currentHash <== ((i < depth) * levelHash.out) + ((i >= depth) * currentHash);
+    signal computedPath[levels];
+
+    for (var i = 0; i < levels; i++) {
+        selectors[i] = PositionSwitcher();
+        selectors[i].in[0] <== i == 0 ? leaf : computedPath[i - 1];
+        selectors[i].in[1] <== pathElements[i];
+        selectors[i].s <== pathIndices[i];
+
+        hashers[i] = Poseidon(2);
+        hashers[i].inputs[0] <== selectors[i].out[0];
+        hashers[i].inputs[1] <== selectors[i].out[1];
+        computedPath[i] <== hashers[i].out;
     }
 
-    root <== currentHash;
+    root <== computedPath[levels - 1];
 }

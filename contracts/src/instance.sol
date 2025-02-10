@@ -42,8 +42,7 @@ contract Instance is Ownable {
 
     VerifyZKProof private immutable i_verifyZKProof;
 
-    mapping(bytes32 contributerHash => bool hasContributed)
-        public s_contributers;
+    mapping(bytes32 contributerHash => bool hasContributed) public s_contributers;
     mapping(bytes32 claimerHash => bool hasClaimed) public s_claimers;
 
     Status public s_status;
@@ -77,8 +76,9 @@ contract Instance is Ownable {
 
     // modifiers
     modifier _unlocked() {
-        if (block.timestamp < i_launchTime || block.timestamp > i_saleDeadline)
+        if (block.timestamp < i_launchTime || block.timestamp > i_saleDeadline) {
             revert Locked();
+        }
         if (s_status == Status.LOCKED) revert Locked();
         _;
     }
@@ -103,7 +103,7 @@ contract Instance is Ownable {
 
     /**
      * @dev Function used to contribute ETH to the instance.
-     * @param commitment Commitment hash
+     * @param nullifier Nullifier hash
      * @param amount Amount to contribute
      * @param attestationId Attestation ID
      * @param merklePath Merkle path
@@ -116,7 +116,7 @@ contract Instance is Ownable {
      *       4. The amount must be greater than or equal to the minimum fee and lesser than or equal to the maximum fee
      */
     function conribute(
-        bytes32 commitment,
+        bytes32 nullifier,
         uint256 amount,
         uint256 attestationId,
         bytes32[] calldata merklePath,
@@ -129,25 +129,18 @@ contract Instance is Ownable {
         if (amount > i_maxFee) revert Exceeds_Contribution_Limit();
         if (msg.value != amount) revert Insufficient_Amount();
 
-        if (s_contributers[commitment]) revert Already_Contributed();
-        i_verifyZKProof.verifyZKProof(
-            attestationId,
-            merkleRoot,
-            treeDepth,
-            merklePath,
-            leafCount,
-            index
-        );
+        if (s_contributers[nullifier]) revert Already_Contributed();
+        i_verifyZKProof.verifyZKProof(attestationId, merkleRoot, treeDepth, merklePath, leafCount, index);
 
-        s_contributers[commitment] = true;
+        s_contributers[nullifier] = true;
         s_totalContrib += amount;
 
-        emit Contributed(commitment, amount);
+        emit Contributed(nullifier, amount);
     }
 
     /**
      * @dev Function used to claim the tokens after the sale period is over
-     * @param commitment Commitment hash
+     * @param nullifier Nullifier hash
      * @param amount Amount to claim
      * @param attestationId Attestation ID
      * @param merklePath Merkle path
@@ -162,7 +155,7 @@ contract Instance is Ownable {
      *       5. The user can only claim once
      */
     function claim(
-        bytes32 commitment,
+        bytes32 nullifier,
         bytes32 amount,
         uint256 attestationId,
         bytes32[] calldata merklePath,
@@ -172,20 +165,14 @@ contract Instance is Ownable {
         uint256 treeDepth
     ) external onlyOwner {
         if (block.timestamp < i_launchTime) revert Not_Reached_Launch_Time();
-        if (block.timestamp < i_saleDeadline)
+        if (block.timestamp < i_saleDeadline) {
             revert Contribution_Phase_Ongoing();
-        if (s_claimers[commitment]) revert Already_Claimed();
+        }
+        if (s_claimers[nullifier]) revert Already_Claimed();
 
-        i_verifyZKProof.verifyZKProof(
-            attestationId,
-            merkleRoot,
-            treeDepth,
-            merklePath,
-            leafCount,
-            index
-        );
-        s_claimers[commitment] = true;
+        i_verifyZKProof.verifyZKProof(attestationId, merkleRoot, treeDepth, merklePath, leafCount, index);
+        s_claimers[nullifier] = true;
 
-        emit Claimed(commitment, amount);
+        emit Claimed(nullifier, amount);
     }
 }

@@ -8,10 +8,10 @@ include "./merkle_proof.circom";
 template WhitelistVerification(MAX_DEPTH) {
     // public
     signal input merkleRoot;
-    signal input TREE_DEPTH;
 
     // private
     signal input path[MAX_DEPTH];
+    signal input pathElements[MAX_DEPTH];
     signal input userAddress;
 
     signal output isIncluded;
@@ -20,10 +20,10 @@ template WhitelistVerification(MAX_DEPTH) {
     hasher.inputs[0] <== userAddress;
     signal hashedLeaf <== hasher.out;
 
-    component merkleProof = MerkleProof();
+    component merkleProof = VerifyMerklePath(MAX_DEPTH);
     merkleProof.leaf <== hashedLeaf;
-    merkleProof.path <== path;
-    merkleProof.depth <== TREE_DEPTH;
+    merkleProof.pathElements <== pathElements;
+    merkleProof.pathIndices <== path;
     signal calculatedRoot <== merkleProof.root;
 
     component rootComparator = IsEqual();
@@ -33,4 +33,4 @@ template WhitelistVerification(MAX_DEPTH) {
     isIncluded <== rootComparator.out;
 }
 
-component main {public [merkleRoot, TREE_DEPTH]} = WhitelistVerification(32);
+component main {public [merkleRoot]} = WhitelistVerification(32);

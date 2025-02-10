@@ -11,12 +11,7 @@ contract Factory {
     error Invalid_Symbol();
 
     // events
-    event NewInstance(
-        string name,
-        string symbol,
-        address instance,
-        address whitelist
-    );
+    event NewInstance(string name, string symbol, address instance, address whitelist);
 
     //mappings
     mapping(string name => InstanceParams) s_nameToParams;
@@ -69,14 +64,8 @@ contract Factory {
         uint256 salePeriod,
         address zkVerifyAddr
     ) public returns (address, address) {
-        Whitelist whitelist = new Whitelist(
-            name,
-            symbol,
-            tokenAddr,
-            supportPeriod,
-            totalSupply / maxContrib,
-            msg.sender
-        );
+        Whitelist whitelist =
+            new Whitelist(name, symbol, tokenAddr, supportPeriod, totalSupply / maxContrib, msg.sender);
         Instance instance = new Instance(
             name,
             symbol,
@@ -110,9 +99,7 @@ contract Factory {
      * @dev Returns the instance parameters from the name
      * @param name Name of the token
      */
-    function getDetailsFromName(
-        string memory name
-    ) public view returns (InstanceParams memory) {
+    function getDetailsFromName(string memory name) public view returns (InstanceParams memory) {
         if (s_nameToParams[name].instanceAddr == address(0)) {
             revert Invalid_Name();
         }
@@ -123,9 +110,7 @@ contract Factory {
      * @dev Returns the instance parameters from the symbol
      * @param symbol Symbol of the token
      */
-    function getDetailsFromSymbol(
-        string memory symbol
-    ) public view returns (InstanceParams memory) {
+    function getDetailsFromSymbol(string memory symbol) public view returns (InstanceParams memory) {
         if (s_symbolToParams[symbol].instanceAddr == address(0)) {
             revert Invalid_Symbol();
         }

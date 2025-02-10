@@ -14,7 +14,7 @@ export const getProof = (leaves: string[], leaf: string): string[] => {
   const tree = new MerkleTree(leaves, buildPoseidonOpt, {
     sortPairs: true,
   });
-  const proof = tree.getProof(leaf).map((el) => el.data.toString("hex"));
+  const proof = tree.getHexProof(leaf);
 
   return proof;
 };

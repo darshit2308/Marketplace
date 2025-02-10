@@ -8,11 +8,11 @@ include "./merkle_proof.circom";
 template ContributionProof(MAX_DEPTH) {
     // public
     signal input merkleRoot;
-    signal input TREE_DEPTH;
 
     // private 
     signal input userAddress;
     signal input contribution;
+    signal input pathElements[MAX_DEPTH];
     signal input path[MAX_DEPTH];
     
     component hasher = Poseidon(2);
@@ -21,11 +21,11 @@ template ContributionProof(MAX_DEPTH) {
     signal hashedLeaf <== hasher.out;
 
     signal output hasContributed;
-    component merkleProof = MerkleProof(MAX_DEPTH);
+    component merkleProof = VerifyMerklePath(MAX_DEPTH);
 
     merkleProof.leaf <== hashedLeaf;
-    merkleProof.depth <== TREE_DEPTH;
-    merkleProof.path <== path;
+    merkleProof.pathElements <== pathElements;
+    merkleProof.pathIndices <== path;
     signal calculatedRoot <== merkleProof.root;
 
     component comparator = IsEqual();
@@ -35,4 +35,4 @@ template ContributionProof(MAX_DEPTH) {
     hasContributed <== comparator.out;
 }
 
-component main {public [merkleRoot, TREE_DEPTH]} = ContributionProof(32);
+component main {public [merkleRoot]} = ContributionProof(32);

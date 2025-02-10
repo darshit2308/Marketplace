@@ -40,13 +40,8 @@ contract VeilPadTests is Test {
 
     //helpers
 
-    function getCommitment(
-        string memory secret,
-        address userAddr
-    ) internal pure returns (bytes32) {
-        bytes32 commitment = bytes32(
-            keccak256(abi.encodePacked(userAddr, secret))
-        );
+    function getCommitment(string memory secret, address userAddr) internal pure returns (bytes32) {
+        bytes32 commitment = bytes32(keccak256(abi.encodePacked(userAddr, secret)));
         return commitment;
     }
 
@@ -65,11 +60,7 @@ contract VeilPadTests is Test {
         whitelist.register(commitment);
         assertEq(whitelist.s_supporterCount(), 1);
         assertTrue(whitelist.s_registered(commitment));
-        assertFalse(
-            whitelist.s_registered(
-                bytes32(keccak256(abi.encodePacked(userAddr)))
-            )
-        );
+        assertFalse(whitelist.s_registered(bytes32(keccak256(abi.encodePacked(userAddr)))));
     }
 
     function testMoreThanMaxSupportersCannotRegister() external {
@@ -115,32 +106,32 @@ contract VeilPadTests is Test {
 
     function testCantContributeBeforeLaunchTime() external {
         vm.expectRevert(Instance.Locked.selector);
-        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0);
+        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0, "", 0);
     }
 
     function testCantContributeAfterSaleDeadline() external {
         vm.warp(instance.i_saleDeadline() + 1);
         vm.expectRevert(Instance.Locked.selector);
-        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0);
+        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0, "", 0);
     }
 
     function testCantContributeWhenLocked() external {
         vm.warp(instance.i_launchTime() + 1);
         instance.lock();
         vm.expectRevert(Instance.Locked.selector);
-        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0);
+        instance.conribute(bytes32(0), 1 ether, 0, new bytes32[](0), 0, 0, "", 0);
     }
 
     function testRevertsWhenAmountIsLessThanMinFee() external {
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Insufficient_Amount.selector);
-        instance.conribute(bytes32(0), 0.4 ether, 0, new bytes32[](0), 0, 0);
+        instance.conribute(bytes32(0), 0.4 ether, 0, new bytes32[](0), 0, 0, "", 0);
     }
 
     function testRevertsWhenAmountIsGreaterThanMaxFee() external {
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Exceeds_Contribution_Limit.selector);
-        instance.conribute(bytes32(0), 2.1 ether, 0, new bytes32[](0), 0, 0);
+        instance.conribute(bytes32(0), 2.1 ether, 0, new bytes32[](0), 0, 0, "", 0);
     }
 
     function testOnlyOwnerCanLockAndUnlock() external {
@@ -166,10 +157,10 @@ contract VeilPadTests is Test {
 
     function testCantClaimBeforeSaleDeadline() external {
         vm.expectRevert(Instance.Not_Reached_Launch_Time.selector);
-        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0);
+        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0, "", 0);
 
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Contribution_Phase_Ongoing.selector);
-        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0);
+        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0, "", 0);
     }
 }

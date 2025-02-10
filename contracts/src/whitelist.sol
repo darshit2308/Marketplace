@@ -25,7 +25,7 @@ contract Whitelist is Ownable {
 
     bytes32 private s_merkleRoot;
 
-    mapping(bytes32 commitment => bool hasregistered) public s_registered;
+    mapping(bytes32 nullifier => bool hasregistered) public s_registered;
 
     constructor(
         string memory _name,
@@ -46,20 +46,21 @@ contract Whitelist is Ownable {
 
     /**
      * @dev Registers a supporter
-     * @param _commitment Commitment hash of the supporter, which is calculated by hashing the user's address hash with a secret string
+     * @param _nullifier Nullifier hash of the supporter, which is calculated by hashing the user's address hash with a secret string
      * NOTE: 1. This function can only be called by the owner, to prevent the user's address from getting leaked or traced
      *       2. The supporter can only register if the deadline has not been reached and the supporter limit has not been reached
      */
-    function register(bytes32 _commitment) public onlyOwner returns (bool) {
+    function register(bytes32 _nullifier) public onlyOwner returns (bool) {
         if (block.timestamp > i_deadline) revert Deadline_Reached();
-        if (s_supporterCount == i_maxSupporters)
+        if (s_supporterCount == i_maxSupporters) {
             revert Supporter_Limit_Reached();
+        }
 
-        if (s_registered[_commitment]) revert Already_Registered();
-        s_registered[_commitment] = true;
+        if (s_registered[_nullifier]) revert Already_Registered();
+        s_registered[_nullifier] = true;
         s_supporterCount++;
 
-        emit Registered(_commitment);
+        emit Registered(_nullifier);
         return true;
     }
 
