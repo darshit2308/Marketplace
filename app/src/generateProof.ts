@@ -1,9 +1,10 @@
 import groth16, { CircuitSignals } from "snarkjs";
 
-export const generateProof = async (objectParams: Object) => {
-  const wasmPath = "";
-  const zkeyPath = "";
-
+export const generateProof = async (
+  objectParams: Object,
+  wasmPath: string,
+  zkeyPath: string
+) => {
   const groth16Prover = groth16.groth16;
   const { proof, publicSignals } = await groth16Prover.fullProve(
     objectParams as CircuitSignals,
@@ -19,6 +20,9 @@ export const generateProofWhitelist = async (
   merkeleproof: string[],
   root: string
 ) => {
+  const zkeyPath = "../../zkp/setup/whitelist_inclusion_0001.zkey";
+  const wasmPath = "../../zkp/setup/whitelist_inclusion.wasm";
+
   const merkeleproofBigint = merkeleproof.map((el) => BigInt(el));
   const params = {
     merkleRoot: BigInt(root),
@@ -27,7 +31,7 @@ export const generateProofWhitelist = async (
     commitment: BigInt(commitment),
   };
 
-  return generateProof(params);
+  return generateProof(params, wasmPath, zkeyPath);
 };
 
 export const generateProofContribution = async (
@@ -36,6 +40,8 @@ export const generateProofContribution = async (
   root: string,
   contribution: number
 ) => {
+  const zkeyPath = "../../zkp/setup/contribution_proof_0001.zkey";
+  const wasmPath = "../../zkp/setup/contribution_proof.wasm";
   const merkeleproofBigint = merkeleproof.map((el) => BigInt(el));
   const params = {
     merkleRoot: BigInt(root),
@@ -45,5 +51,5 @@ export const generateProofContribution = async (
     contribution: BigInt(contribution),
   };
 
-  return generateProof(params);
+  return generateProof(params, wasmPath, zkeyPath);
 };
