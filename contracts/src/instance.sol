@@ -42,7 +42,8 @@ contract Instance is Ownable {
 
     VerifyZKProof private immutable i_verifyZKProof;
 
-    mapping(bytes32 contributerHash => bool hasContributed) public s_contributers;
+    mapping(bytes32 contributerHash => bool hasContributed)
+        public s_contributers;
     mapping(bytes32 claimerHash => bool hasClaimed) public s_claimers;
 
     Status public s_status;
@@ -76,7 +77,9 @@ contract Instance is Ownable {
 
     // modifiers
     modifier _unlocked() {
-        if (block.timestamp < i_launchTime || block.timestamp > i_saleDeadline) {
+        if (
+            block.timestamp < i_launchTime || block.timestamp > i_saleDeadline
+        ) {
             revert Locked();
         }
         if (s_status == Status.LOCKED) revert Locked();
@@ -122,15 +125,20 @@ contract Instance is Ownable {
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
-        bytes32 merkleRoot,
-        uint256 treeDepth
+        bytes32 merkleRoot
     ) external payable onlyOwner _unlocked {
         if (amount < i_minFee) revert Insufficient_Amount();
         if (amount > i_maxFee) revert Exceeds_Contribution_Limit();
         if (msg.value != amount) revert Insufficient_Amount();
 
         if (s_contributers[nullifier]) revert Already_Contributed();
-        i_verifyZKProof.verifyZKProof(attestationId, merkleRoot, treeDepth, merklePath, leafCount, index);
+        i_verifyZKProof.verifyZKProof(
+            attestationId,
+            merkleRoot,
+            merklePath,
+            leafCount,
+            index
+        );
 
         s_contributers[nullifier] = true;
         s_totalContrib += amount;
@@ -161,8 +169,7 @@ contract Instance is Ownable {
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
-        bytes32 merkleRoot,
-        uint256 treeDepth
+        bytes32 merkleRoot
     ) external onlyOwner {
         if (block.timestamp < i_launchTime) revert Not_Reached_Launch_Time();
         if (block.timestamp < i_saleDeadline) {
@@ -170,7 +177,13 @@ contract Instance is Ownable {
         }
         if (s_claimers[nullifier]) revert Already_Claimed();
 
-        i_verifyZKProof.verifyZKProof(attestationId, merkleRoot, treeDepth, merklePath, leafCount, index);
+        i_verifyZKProof.verifyZKProof(
+            attestationId,
+            merkleRoot,
+            merklePath,
+            leafCount,
+            index
+        );
         s_claimers[nullifier] = true;
 
         emit Claimed(nullifier, amount);
