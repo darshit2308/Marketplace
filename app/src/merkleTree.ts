@@ -10,11 +10,14 @@ export const getRoot = (leaves: string[]): string => {
   return root;
 };
 
-export const getProof = (leaves: string[], leaf: string): string[] => {
+export const getHexProof = (leaves: string[], leaf: string): Object => {
   const tree = new MerkleTree(leaves, buildPoseidonOpt, {
     sortPairs: true,
   });
-  const proof = tree.getHexProof(leaf);
 
-  return proof;
+  const proof = tree.getProof(leaf);
+  const binaryProof = proof.map((el) => (el.position == "right" ? 0 : 1));
+  const hexProof = tree.getHexProof(leaf);
+
+  return { binaryProof, hexProof };
 };
