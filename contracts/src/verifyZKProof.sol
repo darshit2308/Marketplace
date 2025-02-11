@@ -6,13 +6,11 @@ contract VerifyZKProof {
         keccak256(abi.encodePacked("groth16"));
 
     address public immutable zkvContract;
-    bytes32 public immutable vkHash;
 
     event SuccessfulProofSubmission();
 
-    constructor(address _zkvContract, bytes32 _vkHash) {
+    constructor(address _zkvContract) {
         zkvContract = _zkvContract;
-        vkHash = _vkHash;
     }
 
     function verifyZKProof(
@@ -20,7 +18,8 @@ contract VerifyZKProof {
         bytes32 merkleRoot,
         bytes32[] calldata merklePath,
         uint256 leafCount,
-        uint256 index
+        uint256 index,
+        bytes32 vkHash
     ) external {
         require(
             _verifyProofHasBeenPostedToZkv(
@@ -28,7 +27,8 @@ contract VerifyZKProof {
                 merkleRoot,
                 merklePath,
                 leafCount,
-                index
+                index,
+                vkHash
             )
         );
         emit SuccessfulProofSubmission();
@@ -39,7 +39,8 @@ contract VerifyZKProof {
         bytes32 merkleRoot,
         bytes32[] calldata merklePath,
         uint256 leafCount,
-        uint256 index
+        uint256 index,
+        bytes32 vkHash
     ) internal view returns (bool) {
         bytes memory encodedInput = abi.encodePacked(
             _changeEndianess(uint256(merkleRoot))

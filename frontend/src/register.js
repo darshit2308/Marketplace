@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../src/register.css";
 import Web3 from "web3";
+import {ethers} from "ethers";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -27,16 +28,16 @@ const RegisterPage = () => {
         return;
       }
 
-      const web3 = new Web3(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       console.log("Web3 initialized successfully");
 
       // Request account access if needed
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+      provider.send("eth_requestAccounts");
+      const address = await provider.getSigner().getAddress();
       console.log("Accounts accessed successfully");
 
       // Get the first account
-      const accounts = await web3.eth.getAccounts();
-      const account = accounts[0];
+      
       console.log("Connected account:", account);
     } catch (error) {
       console.error("Error in handleSubmit:", error);

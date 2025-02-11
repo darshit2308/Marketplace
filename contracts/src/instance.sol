@@ -16,8 +16,8 @@ contract Instance is Ownable {
     error Not_Reached_Launch_Time();
 
     // events
-    event Contributed(bytes32 commitment, uint256 amount);
-    event Claimed(bytes32 commitment, bytes32 amount);
+    event Contributed(bytes32 nullififer, uint256 amount);
+    event Claimed(bytes32 nullififer, bytes32 claimCmmitment);
 
     // enums
     enum Status {
@@ -40,6 +40,9 @@ contract Instance is Ownable {
 
     uint256 public s_totalContrib;
 
+    bytes32 private immutable i_whitelistVKHash;
+    bytes32 private immutable i_contributionVKHash;
+
     VerifyZKProof private immutable i_verifyZKProof;
 
     mapping(bytes32 contributerHash => bool hasContributed)
@@ -59,7 +62,9 @@ contract Instance is Ownable {
         uint256 _supportPeriod,
         uint256 _salePeriod,
         address _owner,
-        address _verifyZKProofAddr
+        address _verifyZKProofAddr,
+        bytes32 _whitelistVKHash,
+        bytes32 _contributionVKHash
     ) Ownable(_owner) {
         NAME = _name;
         SYMBOL = _symbol;
@@ -73,6 +78,8 @@ contract Instance is Ownable {
         s_status = Status.UNLOCKED;
         s_totalContrib = 0;
         i_verifyZKProof = VerifyZKProof(_verifyZKProofAddr);
+        i_whitelistVKHash = _whitelistVKHash;
+        i_contributionVKHash = _contributionVKHash;
     }
 
     // modifiers
@@ -107,7 +114,6 @@ contract Instance is Ownable {
     /**
      * @dev Function used to contribute ETH to the instance.
      * @param nullifier Nullifier hash
-     * @param amount Amount to contribute
      * @param attestationId Attestation ID
      * @param merklePath Merkle path
      * @param leafCount Leaf count
@@ -120,16 +126,14 @@ contract Instance is Ownable {
      */
     function conribute(
         bytes32 nullifier,
-        uint256 amount,
         uint256 attestationId,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
         bytes32 merkleRoot
-    ) external payable onlyOwner _unlocked {
-        if (amount < i_minFee) revert Insufficient_Amount();
-        if (amount > i_maxFee) revert Exceeds_Contribution_Limit();
-        if (msg.value != amount) revert Insufficient_Amount();
+    ) external payable _unlocked {
+        if (msg.value < i_minFee) revert Insufficient_Amount();
+        if (msg.value > i_maxFee) revert Exceeds_Contribution_Limit();
 
         if (s_contributers[nullifier]) revert Already_Contributed();
         i_verifyZKProof.verifyZKProof(
@@ -137,19 +141,20 @@ contract Instance is Ownable {
             merkleRoot,
             merklePath,
             leafCount,
-            index
+            index,
+            i_whitelistVKHash
         );
 
         s_contributers[nullifier] = true;
-        s_totalContrib += amount;
+        s_totalContrib += msg.value;
 
-        emit Contributed(nullifier, amount);
+        emit Contributed(nullifier, msg.value);
     }
 
     /**
      * @dev Function used to claim the tokens after the sale period is over
      * @param nullifier Nullifier hash
-     * @param amount Amount to claim
+     * @param claimCommitment Hash of claim amount and user's nullifier
      * @param attestationId Attestation ID
      * @param merklePath Merkle path
      * @param leafCount Leaf count
@@ -164,7 +169,7 @@ contract Instance is Ownable {
      */
     function claim(
         bytes32 nullifier,
-        bytes32 amount,
+        bytes32 claimCommitment,
         uint256 attestationId,
         bytes32[] calldata merklePath,
         uint256 leafCount,
@@ -182,10 +187,11 @@ contract Instance is Ownable {
             merkleRoot,
             merklePath,
             leafCount,
-            index
+            index,
+            i_contributionVKHash
         );
         s_claimers[nullifier] = true;
 
-        emit Claimed(nullifier, amount);
+        emit Claimed(nullifier, claimCommitment);
     }
 }

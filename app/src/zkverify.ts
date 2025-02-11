@@ -90,7 +90,7 @@ const zkVerifyAndCallMethod = async (
     null
   );
 
-  if (method == "cliam") {
+  if (method == "claim") {
     zkvContract.once(filterAttestationsById, async (_id, _root) => {
       const txResponse = await appContract.claim(
         commitment,
