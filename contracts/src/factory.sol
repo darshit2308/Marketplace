@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 
 import {Whitelist} from "./whitelist.sol";
 import {Instance} from "./instance.sol";
+import {Token} from "./token.sol";
 
 contract Factory {
     // custom errors
@@ -55,7 +56,6 @@ contract Factory {
      * @dev Creates a new instance and whitelist contract
      * @param name Name of the token
      * @param symbol Symbol of the token
-     * @param tokenAddr Address of the token contract
      * @param totalSupply Total supply of the token that is to be sold
      * @param supportPeriod Duration of the whitelisting period
      * @param minContrib Minimum contribution amount
@@ -66,18 +66,18 @@ contract Factory {
     function newInstance(
         string memory name,
         string memory symbol,
-        address tokenAddr,
         uint256 totalSupply,
         uint256 supportPeriod,
         uint256 minContrib,
         uint256 maxContrib,
         uint256 salePeriod,
         address zkVerifyAddr
-    ) public returns (address, address) {
+    ) public returns (address, address, address) {
+        Token token = new Token(name, symbol, totalSupply, msg.sender);
         Whitelist whitelist = new Whitelist(
             name,
             symbol,
-            tokenAddr,
+            address(token),
             supportPeriod,
             totalSupply / maxContrib,
             msg.sender
@@ -85,7 +85,7 @@ contract Factory {
         Instance instance = new Instance(
             name,
             symbol,
-            tokenAddr,
+            address(token),
             address(whitelist),
             totalSupply,
             minContrib,
@@ -101,7 +101,7 @@ contract Factory {
         InstanceParams memory params = InstanceParams({
             name: name,
             symbol: symbol,
-            tokenAddr: tokenAddr,
+            tokenAddr: address(token),
             whitelistAddr: address(whitelist),
             instanceAddr: address(instance)
         });
@@ -110,7 +110,7 @@ contract Factory {
         s_instances.push(params);
 
         emit NewInstance(name, symbol, address(instance), address(whitelist));
-        return (address(instance), address(whitelist));
+        return (address(instance), address(whitelist), address(token));
     }
 
     /**
