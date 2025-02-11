@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "../src/register.css";
-import Web3 from "web3";
 import {ethers} from "ethers";
 
 const RegisterPage = () => {
@@ -28,17 +27,18 @@ const RegisterPage = () => {
         return;
       }
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum)
       console.log("Web3 initialized successfully");
 
       // Request account access if needed
-      provider.send("eth_requestAccounts");
-      const address = await provider.getSigner().getAddress();
+      provider.send("eth_requestAccounts", []);
+      const addresses = await provider.listAccounts()
+      const address = addresses[0].address;
       console.log("Accounts accessed successfully");
 
       // Get the first account
       
-      console.log("Connected account:", account);
+      console.log("Connected account:", address);
     } catch (error) {
       console.error("Error in handleSubmit:", error);
     }
