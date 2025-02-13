@@ -16,8 +16,8 @@ contract Instance is Ownable {
     error Not_Reached_Launch_Time();
 
     // events
-    event Contributed(bytes32 nullififer, uint256 amount);
-    event Claimed(bytes32 nullififer, bytes32 claimCmmitment);
+    event Contributed(uint256 indexed nullififer, uint256 amount);
+    event Claimed(uint256 indexed nullififer, uint256 indexed claimCmmitment);
 
     // enums
     enum Status {
@@ -45,9 +45,9 @@ contract Instance is Ownable {
 
     VerifyZKProof private immutable i_verifyZKProof;
 
-    mapping(bytes32 contributerHash => bool hasContributed)
+    mapping(uint256 contributerHash => bool hasContributed)
         public s_contributers;
-    mapping(bytes32 claimerHash => bool hasClaimed) public s_claimers;
+    mapping(uint256 claimerHash => bool hasClaimed) public s_claimers;
 
     Status public s_status;
 
@@ -118,20 +118,19 @@ contract Instance is Ownable {
      * @param merklePath Merkle path
      * @param leafCount Leaf count
      * @param index Index
-     * NOTE: 1. Only the owner can call this function, so that the addresses of the users cannot get traced or leaked
-     *       2. Requires a valid ZK proof of the user being whitelisted, verifies the proof on the zkVerify contract
+     * NOTE: 1. Requires a valid ZK proof of the user being whitelisted, verifies the proof on the zkVerify contract
      *          and then adds the hash of the user and contribution to the merkle tree off-chain
-     *       3. Can only be called when the instance is unlocked
-     *       4. The amount must be greater than or equal to the minimum fee and lesser than or equal to the maximum fee
+     *       2. Can only be called when the instance is unlocked
+     *       3. The amount must be greater than or equal to the minimum fee and lesser than or equal to the maximum fee
      */
     function conribute(
-        bytes32 nullifier,
+        uint256 nullifier,
         uint256 attestationId,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
-        bytes32 merkleRoot
-    ) external payable _unlocked {
+        uint256 merkleRoot
+    ) public payable _unlocked {
         if (msg.value < i_minFee) revert Insufficient_Amount();
         if (msg.value > i_maxFee) revert Exceeds_Contribution_Limit();
 
@@ -159,23 +158,22 @@ contract Instance is Ownable {
      * @param merklePath Merkle path
      * @param leafCount Leaf count
      * @param index Index
-     * NOTE: 1. Only the owner can call this function, so that the addresses of the users cannot get traced or leaked
-     *       2. Requires a valid ZK proof of the user being in the contributors merkle tree, verifies the proof on the zkVerify contract
+     * NOTE: 1. Requires a valid ZK proof of the user being in the contributors merkle tree, verifies the proof on the zkVerify contract
      *          and then calculates the amount of tokens to be claimed by the user based on their contribution and transfers them to the
      *          user's address off-chain
-     *       3. Can only be called after the sale period is over
-     *       4. The user must have contributed to the instance
-     *       5. The user can only claim once
+     *       2. Can only be called after the sale period is over
+     *       3. The user must have contributed to the instance
+     *       4. The user can only claim once
      */
     function claim(
-        bytes32 nullifier,
-        bytes32 claimCommitment,
+        uint256 nullifier,
+        uint256 claimCommitment,
         uint256 attestationId,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
-        bytes32 merkleRoot
-    ) external onlyOwner {
+        uint256 merkleRoot
+    ) public {
         if (block.timestamp < i_launchTime) revert Not_Reached_Launch_Time();
         if (block.timestamp < i_saleDeadline) {
             revert Contribution_Phase_Ongoing();
@@ -193,5 +191,13 @@ contract Instance is Ownable {
         s_claimers[nullifier] = true;
 
         emit Claimed(nullifier, claimCommitment);
+    }
+
+    function getTotalContrib() external view returns (uint256) {
+        return s_totalContrib;
+    }
+
+    function getTotalSupply() external view returns (uint256) {
+        return i_totalSupply;
     }
 }

@@ -47,8 +47,8 @@ contract VeilPadTests is Test {
     function getCommitment(
         string memory secret,
         address userAddr
-    ) internal pure returns (bytes32) {
-        bytes32 commitment = bytes32(
+    ) internal pure returns (uint256) {
+        uint256 commitment = uint256(
             keccak256(abi.encodePacked(userAddr, secret))
         );
         return commitment;
@@ -64,14 +64,14 @@ contract VeilPadTests is Test {
     function testRegistering() external {
         address userAddr = address(1000);
         string memory secret = "secret";
-        bytes32 commitment = getCommitment(secret, userAddr);
+        uint256 commitment = getCommitment(secret, userAddr);
 
         whitelist.register(commitment);
         assertEq(whitelist.s_supporterCount(), 1);
         assertTrue(whitelist.s_registered(commitment));
         assertFalse(
             whitelist.s_registered(
-                bytes32(keccak256(abi.encodePacked(userAddr)))
+                uint256(keccak256(abi.encodePacked(userAddr)))
             )
         );
     }
@@ -81,13 +81,13 @@ contract VeilPadTests is Test {
 
         for (uint256 i = 0; i < whitelist.getMaxSupporters(); i++) {
             address userAddr = address(uint160(1000 + i));
-            bytes32 commitment = getCommitment(secret, userAddr);
+            uint256 commitment = getCommitment(secret, userAddr);
 
             whitelist.register(commitment);
         }
 
         address newUserAddr = address(10);
-        bytes32 newCommitment = getCommitment(secret, newUserAddr);
+        uint256 newCommitment = getCommitment(secret, newUserAddr);
 
         vm.expectRevert(Whitelist.Supporter_Limit_Reached.selector);
         whitelist.register(newCommitment);
@@ -96,7 +96,7 @@ contract VeilPadTests is Test {
     function testCannotRegisterMoreThanOnce() external {
         string memory secret = "secret";
         address userAddr = address(uint160(1000));
-        bytes32 commitment = getCommitment(secret, userAddr);
+        uint256 commitment = getCommitment(secret, userAddr);
         whitelist.register(commitment);
 
         vm.expectRevert(Whitelist.Already_Registered.selector);
@@ -106,11 +106,11 @@ contract VeilPadTests is Test {
     function testCannotRegisterAfterDeadline() external {
         string memory secret = "secret";
         address userAddr = address(uint160(1000));
-        bytes32 commitment = getCommitment(secret, userAddr);
+        uint256 commitment = getCommitment(secret, userAddr);
         whitelist.register(commitment);
 
         address newUserAddr = address(10);
-        bytes32 newCommitment = getCommitment(secret, newUserAddr);
+        uint256 newCommitment = getCommitment(secret, newUserAddr);
 
         vm.warp(block.timestamp + whitelist.i_deadline() + 1);
         vm.expectRevert(Whitelist.Deadline_Reached.selector);
@@ -120,7 +120,7 @@ contract VeilPadTests is Test {
     function testCantContributeBeforeLaunchTime() external {
         vm.expectRevert(Instance.Locked.selector);
         instance.conribute{value: 1 ether}(
-            bytes32(0),
+            uint256(0),
             0,
             new bytes32[](0),
             0,
@@ -133,7 +133,7 @@ contract VeilPadTests is Test {
         vm.warp(instance.i_saleDeadline() + 1);
         vm.expectRevert(Instance.Locked.selector);
         instance.conribute{value: 1 ether}(
-            bytes32(0),
+            uint256(0),
             0,
             new bytes32[](0),
             0,
@@ -147,7 +147,7 @@ contract VeilPadTests is Test {
         instance.lock();
         vm.expectRevert(Instance.Locked.selector);
         instance.conribute{value: 1 ether}(
-            bytes32(0),
+            uint256(0),
             0,
             new bytes32[](0),
             0,
@@ -160,7 +160,7 @@ contract VeilPadTests is Test {
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Insufficient_Amount.selector);
         instance.conribute{value: 0.4 ether}(
-            bytes32(0),
+            uint256(0),
             0,
             new bytes32[](0),
             0,
@@ -173,7 +173,7 @@ contract VeilPadTests is Test {
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Exceeds_Contribution_Limit.selector);
         instance.conribute{value: 2.1 ether}(
-            bytes32(0),
+            uint256(0),
             0,
             new bytes32[](0),
             0,
@@ -205,10 +205,38 @@ contract VeilPadTests is Test {
 
     function testCantClaimBeforeSaleDeadline() external {
         vm.expectRevert(Instance.Not_Reached_Launch_Time.selector);
-        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0, "");
+        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, "");
 
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Contribution_Phase_Ongoing.selector);
-        instance.claim(bytes32(0), bytes32(0), 0, new bytes32[](0), 0, 0, "");
+        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, "");
+    }
+
+    function testVerification() external {
+        (address instanceAddr, , ) = factory.newInstance(
+            "TOKEN",
+            "TKN",
+            100 ether,
+            7 days,
+            0.0001 ether,
+            0.0003 ether,
+            7 days,
+            0x82941a739E74eBFaC72D0d0f8E81B1Dac2f586D5
+        );
+        instance = Instance(instanceAddr);
+        vm.warp(instance.i_launchTime() + 1);
+        bytes32[] memory path = new bytes32[](1);
+        path[0] = bytes32(
+            0x004ae0c0b9b30ba8c99e785e4c90fa215e287aece9954e5f9478b1b16b965f91
+        );
+        vm.prank(0xa53c827DA36eC381216a08339B5197202F51497E);
+        instance.conribute{value: 0.0002 ether}(
+            1149892245620469329129695825637394633465204516,
+            44190,
+            path,
+            2,
+            1,
+            ""
+        );
     }
 }

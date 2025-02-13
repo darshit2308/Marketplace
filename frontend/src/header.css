@@ -1,0 +1,254 @@
+/* .navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  padding: 15px 40px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.navigation ul {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+}
+
+.navigation ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.navigation ul li a:hover {
+  color: #eaeaab;
+} */
+
+/* code 2 */
+/* .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background-color: #121212; /* Dark background */
+/* color: white;
+} */
+
+/* .logo-container {
+  display: flex;
+  align-items: center;
+} */
+
+/* .logo { */
+/* width: 80px; /* Adjust based on your logo */
+/* height: auto; */
+/* margin-right: 10px; */
+/* } */
+/* 
+.site-name {
+  font-size: 24px;
+  font-family: monospace;
+  font-weight: bold; */
+/* color: #00bcd4; Customize with your theme color */
+/* } */
+
+/* .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 40px;
+} */
+/* 
+.nav-links li {
+  display: inline;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  transition: color 0.3s ease;
+} */
+
+/* .nav-links a:hover { */
+/* color: #00bcd4;   */
+/* }   */
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins&family=Sarpanch:wght@400;500;600;700;800;900&display=swap");
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 15px 30px;
+
+  color: white;
+  border-bottom: 2px solid #333;
+}
+
+.logo-nav-container {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: -10px;
+  padding: 10px;
+  position: relative;
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+  filter: brightness(0.9);
+
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.site-name {
+  font-size: 28px;
+  font-family: "Sarpanch", serif;
+  font-weight: 500;
+  margin-left: -15px;
+  color: #d3d0b0;
+}
+
+.nav-links {
+  margin-left: 280px;
+  list-style: none;
+  display: flex;
+  gap: 80px;
+}
+
+.nav-links li {
+  display: inline;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #d3d0b0;
+} */
+@import url("https://fonts.googleapis.com/css2?family=Poppins&family=Sarpanch:wght@400;500;600;700;800;900&display=swap");
+
+/* Header Container */
+.header {
+  display: flex;
+  flex-direction: row; /* Ensures everything is in a row */
+  justify-content: space-between; /* Spread items across */
+  align-items: center; /* Align vertically */
+  padding: 15px 30px;
+  background-color: transparent;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: nowrap; /* Prevents wrapping */
+  width: 100%; /* Ensures full width */
+}
+
+/* Logo Section */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+  filter: brightness(0.9);
+  transition: box-shadow 0.3s ease-in-out;
+}
+.logo-link {
+  text-decoration: none; /* Removes underline */
+  display: flex;
+  align-items: center;
+}
+
+.site-name {
+  text-decoration: none; /* Ensures text inside Link is not underlined */
+  color: inherit; /* Keeps default text color */
+}
+
+.site-name {
+  font-size: 28px;
+  font-family: "Sarpanch", serif;
+  font-weight: 500;
+  margin-left: -15px;
+  color: #d3d0b0;
+}
+
+/* Navigation Links */
+.nav-links {
+  display: flex;
+  flex-direction: row; /* Ensures links are in a row */
+  list-style: none;
+  gap: 40px;
+}
+
+.nav-links li {
+  list-style: none;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #d3d0b0;
+}
+
+/* Right Section (Explore Button) */
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.explore-btn {
+  padding: 10px 20px;
+  background-color: #1a1d23;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  /* Include all properties in the transition */
+  transition: all 0.3s ease;
+}
+
+.explore-btn:hover {
+  background-color: #252b32;
+  transform: scale(1.025);
+  color: #d3d0b0; /* Fixed 'colour' to 'color' */
+  /* Uncomment if you want the shadow effect */
+  /* box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2); */
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column; /* Stack items on smaller screens */
+    align-items: center;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .right-section {
+    margin-top: 10px;
+  }
+}

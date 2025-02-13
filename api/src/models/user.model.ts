@@ -2,18 +2,18 @@
 
 // // Define the User schema
 // const userSchema = new Schema({
-//   name: { 
-//     type: String, 
-//     required: true 
+//   name: {
+//     type: String,
+//     required: true
 // },
-//   email: { 
-//     type: String, 
-//     required: true, 
-//     unique: true 
+//   email: {
+//     type: String,
+//     required: true,
+//     unique: true
 // },
-//   age: 
-//   { type: Number, 
-//     required: false 
+//   age:
+//   { type: Number,
+//     required: false
 // },
 // });
 
@@ -22,28 +22,31 @@
 
 // export default User;
 
-
-import { Schema , model } from "mongoose";
-const tokenDetails = new Schema ({
-    name: {
-        type: String ,
-        required: true
-    },
-    symbol: {
-        type: String,
-        required: true
-    },
-    whitelist: {
-        type: [String],
-        required: true
-    },
-    contributors: {
-        type: [String],
-        required: true
-    }
+import { Schema, model } from "mongoose";
+const tokenDetails = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  symbol: {
+    type: String,
+    required: true,
+  },
+  whitelist: {
+    type: [String],
+    required: true,
+  },
+  contributors: {
+    type: [String],
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
 });
 
 // Create the TokenDetails model
-const TokenDetails = model('TokenDetails', tokenDetails);
+const TokenDetails = model("TokenDetails", tokenDetails);
 
 export default TokenDetails;

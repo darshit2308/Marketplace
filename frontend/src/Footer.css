@@ -1,0 +1,336 @@
+/*  
+.footer {
+  background: transparent;
+  backdrop-filter: blur(10px);
+  padding: 4rem 2rem 2rem;
+  position: relative;
+  z-index: 10;
+  color: #fff;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.footer-section {
+  padding: 1rem;
+}
+
+.footer h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer ul li {
+  margin-bottom: 1rem;
+}
+
+.footer ul li a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.footer ul li a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.about-content p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+ 
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.contact-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-links a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.copyright {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+ 
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;  
+    gap: 2rem;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .contact-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .copyright {
+    text-align: center;
+  }
+} */
+
+/* Footer Styles */
+.footer {
+    background: #010e1a;
+    color: #fff;
+    padding: 3rem 1rem; /* Reduced padding */
+    margin-top: 3.6rem;
+  }
+  
+  .footer-content {
+    max-width: 1200px !important;
+    margin: 0 auto;
+  }
+  
+  .footer-grid {
+    display: flex;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 1.5rem; /* Reduced gap between columns */
+  }
+  
+  .footer-section {
+    padding: 1rem;
+    max-width: 800px;
+  }
+  
+  .footer h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    white-space: nowrap;
+  }
+  
+  .footer ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer ul li {
+    margin-bottom: 1rem;
+  }
+  
+  .footer ul li a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+  }
+  
+  .footer ul li a:hover {
+    color: #d3d0b0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  
+  .footer-section p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+  
+  .contact-links {
+    display: flex;
+    gap: 0.75rem; /* Space between the cards */
+    justify-content: center; /* Center them */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto; /* Centering */
+  }
+  
+  .contact-link {
+    flex: 1; /* Distribute space evenly */
+    min-width: 250px;
+    max-width: 350px;
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  /* Responsive Fix for Smaller Screens */
+  @media (max-width: 768px) {
+    .contact-links {
+      flex-direction: column; /* Stack vertically */
+      align-items: center;
+    }
+  
+    .contact-link {
+      width: 80%; /* Make it wider on smaller screens */
+      max-width: none;
+    }
+  }
+  
+  /* Social Icons */
+  .social-icon {
+    color: #fff;
+    transition: color 0.3s ease;
+    font-size: 1rem; /* Reduced icon size */
+  }
+  
+  .social-icon:hover {
+    color: #d3d0b0; /* Example hover effect */
+  }
+  
+  /* Bottom Section */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 1rem;
+  }
+  /* Connect Us Section */
+  .footer-section h3 {
+    padding: 2rem 0; /* Add padding to top and bottom */
+    font-size: 1.5rem; /* Adjust font size */
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center; /* Center align the heading */
+    color: #efefef;
+  }
+  
+  /* If it is inside another class, target that class specifically */
+  .footer-section .contact-links h3 {
+    padding: 2rem 0; /* Add padding to top and bottom */
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center; /* Center align the heading */
+    color: #f4f4f4;
+  }
+  
+  .footer-bottom p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+  }
+  
+  /* Team Member Cards */
+  .team-member {
+    background-color: #1a232e; /* Card background color */
+    padding: 1.5rem;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease,
+      background-color 0.3s ease; /* Smooth transitions */
+  }
+  
+  .team-member:hover {
+    /* transform: translateY(-5px); Slight lift effect */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* More prominent shadow on hover */
+    background-color: #2d3a48; /* Slightly darker background color on hover */
+  }
+  
+  /* Member Name */
+  .member-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0rem;
+    color: #fff;
+    transition: color 0.3s ease;
+  }
+  
+  .team-member:hover .member-name {
+    color: #d3d0b0; /* Change text color on hover */
+  }
+  
+  /* Member Role */
+  .member-role {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .team-member:hover .member-role {
+    color: #d3d0b0; /* Change text color on hover */
+  }
+  
+  /* Social Links */
+  .social-links a {
+    margin: 0 0.5rem;
+  }
+  
+  .social-links a:hover {
+    transform: scale(1.1); /* Slight zoom effect on social icons */
+    color: #0580bd; /* Change icon color on hover */
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr; /* Stack everything in one column */
+      gap: 2rem; /* Slightly reduced gap for smaller screens */
+    }
+  
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .contact-links {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  
+    .team-member {
+      padding: 1rem; /* Reduce padding for smaller screens */
+    }
+  
+    /* Center "Connect Us" in the second column */
+    .footer-grid .contact-links {
+      text-align: center;
+      justify-content: center;
+    }
+  }

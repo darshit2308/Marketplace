@@ -1,6 +1,8 @@
 import React from "react";
 import "../src/register.css";
 import { useState } from "react";
+import callMethod from "./utils/callMethod";
+import { ethers } from "ethers";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -16,9 +18,18 @@ const RegisterPage = () => {
       });
     };
   
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
       e.preventDefault(); 
       console.log("Form Data Submitted:", formData);
+      if (!window.ethereum)
+        alert("Please install metamask or a similar wallet")
+  
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  provider.send("eth_requestAccounts", []);
+  const addresses = await provider.listAccounts();
+  console.log(addresses);
+  const address = addresses[0].address;
+  callMethod(formData.amount, address, formData.token, "claim");
     };
   
     return (
@@ -36,7 +47,16 @@ const RegisterPage = () => {
               placeholder="Enter your token"
               required
             />
+            <input
+            type="number"
+            id="amount"
+            name="amount"
+            value={formData.amount}
+            onChange={handleInputChange}
+            placeholder="Enter the amount that you contributed(in eth)"
+            required/>
           </div>
+          
   
           {/* <div className="form-group">
             <label htmlFor="walletAddress">Wallet Address:</label>

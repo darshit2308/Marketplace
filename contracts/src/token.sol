@@ -13,4 +13,11 @@ contract Token is ERC20, Ownable {
     ) ERC20(name, symbol) Ownable(_owner) {
         _mint(_owner, _totalSupply);
     }
+
+    function transferTokens(
+        address recipient,
+        uint256 amount
+    ) external onlyOwner {
+        transfer(recipient, amount);
+    }
 }

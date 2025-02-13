@@ -1,17 +1,23 @@
-* {
+/* * {
   margin: 0rem;
   padding: 0rem;
 }
-.background{
+.background {
   position: absolute;
   top: 0rem;
   width: 100%;
   z-index: 0.1;
-  background-image:linear-gradient(to top, rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%),url("../images/blockchain\ 08-02-2025\ at\ 02-49-38.jpeg");
+  background-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0,
+      rgba(0, 0, 0, 0.3) 60%,
+      rgba(0, 0, 0, 0.8) 100%
+    ),
+    url("../images/blockchain\ 08-02-2025\ at\ 02-49-38.jpeg");
   height: 80vh;
-  background-size: cover; /* Ensures the image covers the entire container */
-  background-position: center; /* Centers the image */
-  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-size: cover; 
+  background-position: center;  
+  background-repeat: no-repeat;  
   color: white;
 }
 .navigation ul {
@@ -19,7 +25,6 @@
   flex-flow: row nowrap;
   justify-content: flex-start;
   list-style: none;
-  
 }
 .navigation a {
   margin-right: 3rem;
@@ -55,12 +60,11 @@
   position: relative;
   overflow: hidden;
   z-index: 1;
-  box-shadow: 6px 6px 12px #c5c5c5,
-              -6px -6px 12px #ffffff;
- }
- 
- .register::before {
-  content: '';
+  box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
+}
+
+.register::before {
+  content: "";
   width: 0;
   height: 3em;
   border-radius: 30em;
@@ -68,11 +72,167 @@
   top: 0;
   left: 0;
   background-image: linear-gradient(to right, #0fd850 0%, #f9f047 100%);
-  transition: .5s ease;
+  transition: 0.5s ease;
   display: block;
   z-index: -1;
- }
- 
- .register:hover::before {
+}
+
+.register:hover::before {
   width: 9em;
- }
+} */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  /* background: #000; */
+  overflow-x: hidden;
+  font-family: "Arial", sans-serif;
+  color: white;
+}
+
+/* Background Animation */
+/* .animated-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+} */
+.animated-background {
+  position: fixed; /* Ensures it stays as a background */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: radial-gradient(
+    circle,
+    rgba(2, 13, 41, 0.8) 0%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+/* Navigation Bar */
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  /* background: rgba(0, 0, 0, 0.7); */
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 10;
+}
+
+.navigation .logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navigation ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.navigation ul li a {
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+}
+
+.navigation ul li a:hover {
+  color: #ffcc00;
+}
+
+.cta-button {
+  background: #ffcc00;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cta-button:hover {
+  background: #e6b800;
+}
+
+/* Main Content */
+.main-content {
+  text-align: center;
+  padding-top: 50px; /* Adjusted padding */
+  background: transparent !important;
+}
+.trusted-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 50px;
+}
+
+.trusted-badge .icon {
+  margin-right: 10px;
+}
+
+.title {
+  font-size: 50px;
+  margin-top: 20px;
+}
+
+.subtitle {
+  color: #d3d0b0;
+}
+
+/* .description {
+  max-width: 600px;
+  margin: 20px auto;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1.6;
+  color: #fcfcfc;
+  padding: 10px;
+} */
+.description {
+  max-width: 600px;
+  margin: 20px auto;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1.6;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.arrow-icon {
+  margin-left: 10px;
+}
+
+/* Footer Wave */
+.curved-divider {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.register-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #d3d0b0; /* Your button color */
+  color: #000000; /* Text color (adjust as needed) */
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+  background-color: #b8b393; /* Darker shade for hover */
+}

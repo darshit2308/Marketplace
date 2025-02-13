@@ -2,6 +2,8 @@
 pragma solidity ^0.8.20;
 
 contract VerifyZKProof {
+    error Invalid_Proof();
+
     bytes32 public constant PROVING_SYSTEM_ID =
         keccak256(abi.encodePacked("groth16"));
 
@@ -15,33 +17,32 @@ contract VerifyZKProof {
 
     function verifyZKProof(
         uint256 attestationId,
-        bytes32 merkleRoot,
+        uint256 merkleRoot,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
         bytes32 vkHash
     ) external {
-        require(
-            _verifyProofHasBeenPostedToZkv(
-                attestationId,
-                merkleRoot,
-                merklePath,
-                leafCount,
-                index,
-                vkHash
-            )
+        bool valid = _verifyProofHasBeenPostedToZkv(
+            attestationId,
+            merkleRoot,
+            merklePath,
+            leafCount,
+            index,
+            vkHash
         );
+        if (!valid) revert Invalid_Proof();
         emit SuccessfulProofSubmission();
     }
 
     function _verifyProofHasBeenPostedToZkv(
         uint256 attestationId,
-        bytes32 merkleRoot,
+        uint256 merkleRoot,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index,
         bytes32 vkHash
-    ) internal view returns (bool) {
+    ) internal returns (bool) {
         bytes memory encodedInput = abi.encodePacked(
             _changeEndianess(uint256(merkleRoot))
         );
@@ -49,7 +50,7 @@ contract VerifyZKProof {
             abi.encodePacked(PROVING_SYSTEM_ID, vkHash, keccak256(encodedInput))
         );
 
-        (bool callSuccessful, bytes memory validProof) = zkvContract.staticcall(
+        (bool callSuccessful, ) = zkvContract.staticcall(
             abi.encodeWithSignature(
                 "verifyProofAttestation(uint256,bytes32,bytes32[],uint256,uint256)",
                 attestationId,
@@ -60,9 +61,9 @@ contract VerifyZKProof {
             )
         );
 
-        require(callSuccessful);
+        if (!callSuccessful) revert Invalid_Proof();
 
-        return abi.decode(validProof, (bool));
+        return callSuccessful;
     }
 
     function _changeEndianess(uint256 input) internal pure returns (uint256 v) {
