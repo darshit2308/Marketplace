@@ -17,19 +17,10 @@ const zkVerifyAndCallMethod = async (
   root,
   contributionCommitment
 ) => {
-  // const {
-  //   ZKV_RPC_URL,
-  //   ZKV_SEED_PHRASE,
-  //   ETH_RPC_URL,
-  //   ZKVERIFY_CONTRACT_ADDRESS,
-  //   ETH_SECRET_KEY
-  // } = process.env;
-  // console.log(ZKV_RPC_URL)
   const ZKV_RPC_URL = "wss://testnet-rpc.zkverify.io";
-  const ZKV_SEED_PHRASE = "choice more twelve cute mirror income smoke behind setup library access labor";
   const ETH_RPC_URL = "https://arb-sepolia.g.alchemy.com/v2/371S4SnZiwHOjqaLqDWNu1FfgVGpukW5";
   const ZKVERIFY_CONTRACT_ADDRESS = "0x82941a739E74eBFaC72D0d0f8E81B1Dac2f586D5"
-  const ETH_SECRET_KEY = "00652facce59caf704c80274ccb53e9513711213d0551d710c74454056e7b699"
+  const ETH_SECRET_KEY = process.env.ETH_SECRET_KEY
   console.log(String(ZKV_RPC_URL))
 
   let vk;
