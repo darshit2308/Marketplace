@@ -1,66 +1,58 @@
-## Foundry
+# **VeilPad**
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## **Description**
 
-Foundry consists of:
+VeilPad is a **privacy-focused launchpad** that enables users to participate in token sales **anonymously and securely** using zero-knowledge proofs (ZKPs) and Merkle trees. By leveraging cutting-edge cryptographic techniques, VeilPad ensures that users can prove their eligibility and contributions without revealing sensitive data, making token launches safer, fairer, and more decentralized.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## **Workflow**
 
-## Documentation
+### **1. Whitelist Phase**
 
-https://book.getfoundry.sh/
+- Users contribute to the whitelist contract.
+- Their addresses are hashed and added to a **Merkle tree**.
+- The **Merkle root** is updated off-chain and stored on-chain to maintain a decentralized record.
 
-## Usage
+### **2. Contribution Phase**
 
-### Build
+- After the whitelisting period ends, users contribute to the **marketplace contract**.
+- Their address and contribution amount are hashed and added to another **Merkle tree**.
+- The updated **Merkle root** is stored on-chain, allowing contributions to be verified without exposing individual details.
 
-```shell
-$ forge build
-```
+### **3. Claiming Phase**
 
-### Test
+- After the sale period ends, users generate a **ZK proof** to verify their contribution.
+- The proof includes their hashed address, contribution amount, and necessary data.
+- If the proof is valid, the **token transfer function** is called off-chain, ensuring privacy and security.
 
-```shell
-$ forge test
-```
+### **4. ZKVerify Integration**
 
-### Format
+- VeilPad integrates **ZKVerify** to enhance verification and security of zero-knowledge proofs.
+- The **zkverifyjs** library is used to seamlessly integrate ZKVerify with the dApp.
+- Ensures that all ZK proofs are validated efficiently before token distribution.
 
-```shell
-$ forge fmt
-```
+## **Key Features**
 
-### Gas Snapshots
+- **Zero-Knowledge Proofs (ZKPs)**: Users can prove eligibility and contributions without revealing their identity.
+- **Merkle Tree Storage**: Both the **Merkle root** and individual leaves are stored on-chain for maximum decentralization.
+- **Privacy-Preserving Token Transfers**: Contributions remain hidden until the sale ends, preventing front-running.
+- **Secure Whitelisting**: Participants prove eligibility via cryptographic proofs rather than public lists.
+- **Decentralized & Trustless**: All proofs are verified **on-chain**, eliminating centralized identity verification.
+- **ZKVerify Integration**: Ensures secure and efficient validation of zero-knowledge proofs.
 
-```shell
-$ forge snapshot
-```
+## **Technology Stack**
 
-### Anvil
+- **Smart Contracts**: Solidity
+- **ZK Proofs**: Circom, SnarkJS
+- **Backend**: TypeScript, Node.js
+- **Database**: MongoDB (for off-chain operations)
+- **Frontend**: React (Vite-based UI)
+- **Blockchain**: Ethereum-compatible networks
+- **ZK Verification**: ZKVerify, zkverifyjs
 
-```shell
-$ anvil
-```
+## **License**
 
-### Deploy
+This project is licensed under the MIT License.
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+---
 
-### Cast
 
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
