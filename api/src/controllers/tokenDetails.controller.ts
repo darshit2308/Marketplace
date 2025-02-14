@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import TokenDetails from "../models/user.model";
+import TokenDetails from "../models/token.model";
 
 // Controller function to add commitement to the whiteList array
 
 export const createToken = async (req: Request, res: Response) => {
   try {
-    const { name, symbol, address } = req.body;
+    const { name, symbol, address, whitelistAddr, instanceAddr } = req.body;
 
     const whitelist: string[] = [];
     const contributors: string[] = [];
@@ -16,6 +16,8 @@ export const createToken = async (req: Request, res: Response) => {
       whitelist,
       contributors,
       address,
+      whitelistAddr,
+      instanceAddr,
     });
 
     res.send("Created successfully");

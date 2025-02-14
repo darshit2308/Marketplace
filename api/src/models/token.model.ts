@@ -44,6 +44,14 @@ const tokenDetails = new Schema({
     type: String,
     required: true,
   },
+  whitelistAddr: {
+    type: String,
+    required: true,
+  },
+  instanceAddr: {
+    type: String,
+    required: true,
+  },
 });
 
 // Create the TokenDetails model

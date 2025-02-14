@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../src/register.css";
-import {ethers} from "ethers";
+import { ethers } from "ethers";
 import register from "./utils/whitelistRegister";
 
 const RegisterPage = () => {
@@ -38,9 +38,9 @@ const RegisterPage = () => {
       // console.log("Accounts accessed successfully");
 
       // // Get the first account
-      
+
       // console.log("Connected account:", address);
-      register("", formData.token);
+      register(formData.token);
     } catch (error) {
       console.error("Error in handleSubmit:", error);
     }

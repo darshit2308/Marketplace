@@ -16,8 +16,8 @@ contract Instance is Ownable {
     error Not_Reached_Launch_Time();
 
     // events
-    event Contributed(uint256 indexed nullififer, uint256 amount);
-    event Claimed(uint256 indexed nullififer, uint256 indexed claimCmmitment);
+    event Contributed(uint256 indexed nullifier, uint256 amount);
+    event Claimed(uint256 indexed nullifier, uint256 indexed claimCommitment);
 
     // enums
     enum Status {

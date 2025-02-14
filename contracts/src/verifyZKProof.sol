@@ -42,7 +42,7 @@ contract VerifyZKProof {
         uint256 leafCount,
         uint256 index,
         bytes32 vkHash
-    ) internal returns (bool) {
+    ) internal view returns (bool) {
         bytes memory encodedInput = abi.encodePacked(
             _changeEndianess(uint256(merkleRoot))
         );

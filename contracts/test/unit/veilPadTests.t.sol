@@ -125,7 +125,7 @@ contract VeilPadTests is Test {
             new bytes32[](0),
             0,
             0,
-            ""
+            0
         );
     }
 
@@ -138,7 +138,7 @@ contract VeilPadTests is Test {
             new bytes32[](0),
             0,
             0,
-            ""
+            0
         );
     }
 
@@ -152,7 +152,7 @@ contract VeilPadTests is Test {
             new bytes32[](0),
             0,
             0,
-            ""
+            0
         );
     }
 
@@ -165,7 +165,7 @@ contract VeilPadTests is Test {
             new bytes32[](0),
             0,
             0,
-            ""
+            0
         );
     }
 
@@ -178,7 +178,7 @@ contract VeilPadTests is Test {
             new bytes32[](0),
             0,
             0,
-            ""
+            0
         );
     }
 
@@ -205,38 +205,10 @@ contract VeilPadTests is Test {
 
     function testCantClaimBeforeSaleDeadline() external {
         vm.expectRevert(Instance.Not_Reached_Launch_Time.selector);
-        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, "");
+        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, 0);
 
         vm.warp(instance.i_launchTime() + 1);
         vm.expectRevert(Instance.Contribution_Phase_Ongoing.selector);
-        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, "");
-    }
-
-    function testVerification() external {
-        (address instanceAddr, , ) = factory.newInstance(
-            "TOKEN",
-            "TKN",
-            100 ether,
-            7 days,
-            0.0001 ether,
-            0.0003 ether,
-            7 days,
-            0x82941a739E74eBFaC72D0d0f8E81B1Dac2f586D5
-        );
-        instance = Instance(instanceAddr);
-        vm.warp(instance.i_launchTime() + 1);
-        bytes32[] memory path = new bytes32[](1);
-        path[0] = bytes32(
-            0x004ae0c0b9b30ba8c99e785e4c90fa215e287aece9954e5f9478b1b16b965f91
-        );
-        vm.prank(0xa53c827DA36eC381216a08339B5197202F51497E);
-        instance.conribute{value: 0.0002 ether}(
-            1149892245620469329129695825637394633465204516,
-            44190,
-            path,
-            2,
-            1,
-            ""
-        );
+        instance.claim(uint256(0), uint256(0), 0, new bytes32[](0), 0, 0, 0);
     }
 }

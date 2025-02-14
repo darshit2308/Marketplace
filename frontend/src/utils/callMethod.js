@@ -11,45 +11,124 @@ import {
   generateProofContribution,
 } from "./generateProof";
 import { getRoot, getProof } from "./merkleTree";
-import {buildPoseidon} from "circomlibjs";
+import { buildPoseidon } from "circomlibjs";
 import "snarkjs";
 import { ethers } from "ethers";
 
-const callMethod = async (
-  amountContribution,
-  userAddress,
-  symbol,
-  method
-) => {
-  const amount = ethers.parseEther((amountContribution));
-  const contractAddr = "0x2e17F85Cf3D7E3F47C15fF7a192AEc4d7A5cBB9a";
-  const contractABI = ["function contribute(uint256 nullifier, uint256 attestationId, bytes32[] calldata merklePath, uint256 leafCount, uint256 index, uint256 merkleRoot)",
-    "function claim(uint256 nullifier, uint256 claimCommitment, uint256 attestationId, bytes32[] calldata merklePath, uint256 leafCount, uint256 index, uint256 merkleRoot)",
-    "event Contributed(uint256 indexed nullififer, uint256 amount)", "event Claimed(uint256 indexed nullififer, uint256 indexed claimCmmitment)", "function getTotalContrib() returns (uint256)",
-    "function getTotalSupply() external view returns (uint256)"];
+const callMethod = async (amountContribution, userAddress, symbol, method) => {
+  const amount = ethers.parseEther(amountContribution);
+  const instanceUrl = `http://localhost:8000/api/details?symbol=${symbol}`;
+  const instanceResp = await axios.get(instanceUrl);
+  const contractAddr = instanceResp.data.tokenDetails.instanceAddr;
+  const contractABI = [
+    {
+      inputs: [
+        { internalType: "uint256", name: "nullifier", type: "uint256" },
+        { internalType: "uint256", name: "attestationId", type: "uint256" },
+        { internalType: "bytes32[]", name: "merklePath", type: "bytes32[]" },
+        { internalType: "uint256", name: "leafCount", type: "uint256" },
+        { internalType: "uint256", name: "index", type: "uint256" },
+        { internalType: "uint256", name: "merkleRoot", type: "uint256" },
+      ],
+      name: "conribute",
+      outputs: [],
+      stateMutability: "payable",
+      type: "function",
+    },
+    {
+      inputs: [
+        { internalType: "uint256", name: "nullifier", type: "uint256" },
+        { internalType: "uint256", name: "claimCommitment", type: "uint256" },
+        { internalType: "uint256", name: "attestationId", type: "uint256" },
+        { internalType: "bytes32[]", name: "merklePath", type: "bytes32[]" },
+        { internalType: "uint256", name: "leafCount", type: "uint256" },
+        { internalType: "uint256", name: "index", type: "uint256" },
+        { internalType: "uint256", name: "merkleRoot", type: "uint256" },
+      ],
+      name: "claim",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "uint256",
+          name: "nullififer",
+          type: "uint256",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "Contributed",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "uint256",
+          name: "nullififer",
+          type: "uint256",
+        },
+        {
+          indexed: true,
+          internalType: "uint256",
+          name: "claimCmmitment",
+          type: "uint256",
+        },
+      ],
+      name: "Claimed",
+      type: "event",
+    },
+    {
+      inputs: [],
+      name: "getTotalContrib",
+      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getTotalSupply",
+      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+      stateMutability: "view",
+      type: "function",
+    },
+  ];
 
-  //const secret = [1, 2, 3];
   const poseidon = await buildPoseidon();
   const userHash = poseidon([userAddress]);
-  console.log("user hash: ", userHash)
-  //const secretHash = poseidon([secret]);
-  const contributionCommitment = poseidon.F.toString(poseidon([userAddress, amount]));
-  console.log("contributionCommitment: ", contributionCommitment)
+  console.log("user hash: ", userHash);
+  const contributionCommitment = poseidon.F.toString(
+    poseidon([userAddress, amount])
+  );
+  console.log("contributionCommitment: ", contributionCommitment);
   let proof, publicSignals, merkleRoot;
 
   if (method == "contribute") {
     const url = `http://localhost:8000/api/details?symbol=${symbol}`;
 
-  const resp = await axios.get(url);
-  const leaves = resp.data.tokenDetails.whitelist;
-  console.log("whitelist: ", leaves)
+    const resp = await axios.get(url);
+    const leaves = resp.data.tokenDetails.whitelist;
+    console.log("whitelist: ", leaves);
 
-  const {hexProof: pathElements, binaryProof: path} = getProof(leaves, poseidon.F.toString(userHash));
-  merkleRoot = getRoot(leaves);
+    const { hexProof: pathElements, binaryProof: path } = getProof(
+      leaves,
+      poseidon.F.toString(userHash)
+    );
+    merkleRoot = getRoot(leaves);
 
-  console.log("path: ", path)
-  console.log("pathElements: ", pathElements)
-  console.log("root: ", merkleRoot)
+    console.log("path: ", path);
+    console.log("pathElements: ", pathElements);
+    console.log("root: ", merkleRoot);
 
     const res = await generateProofWhitelist(
       userAddress,
@@ -60,13 +139,17 @@ const callMethod = async (
     proof = res.proof;
     publicSignals = res.publicSignals;
   } else {
-    const url = "localhost:8000/api/details";
-    const body = {symbol: symbol}
-  const resp = await axios.get(url, body);
-  const leaves = resp.data.tokenDetails.contributors;
+    const url = `http://localhost:8000/api/details?symbol=${symbol}`;
+    const body = { symbol: symbol };
+    const resp = await axios.get(url, body);
+    const leaves = resp.data.tokenDetails.contributors;
+    console.log("leaves: ", leaves);
 
-  const {path, pathElements} = getProof(leaves, contributionCommitment);
-  merkleRoot = getRoot(leaves);
+    const { hexProof: pathElements, binaryProof: path } = getProof(
+      leaves,
+      contributionCommitment
+    );
+    merkleRoot = getRoot(leaves);
 
     const res = await generateProofContribution(
       userAddress,
@@ -88,7 +171,8 @@ const callMethod = async (
     contractAddr,
     contractABI,
     merkleRoot,
-    contributionCommitment
+    contributionCommitment,
+    symbol
   );
 };
 

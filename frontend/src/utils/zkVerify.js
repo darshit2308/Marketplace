@@ -1,6 +1,4 @@
-import { ZkVerifyEvents, zkVerifySession } from "zkverifyjs";
-import { ethers, isBytesLike } from "ethers";
-import { buildPoseidon } from "circomlibjs";
+import { ethers } from "ethers";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -15,22 +13,21 @@ const zkVerifyAndCallMethod = async (
   contractAddr,
   contractABI,
   root,
-  contributionCommitment
+  contributionCommitment,
+  symbol
 ) => {
-  const ZKV_RPC_URL = "wss://testnet-rpc.zkverify.io";
-  const ETH_RPC_URL = "https://arb-sepolia.g.alchemy.com/v2/371S4SnZiwHOjqaLqDWNu1FfgVGpukW5";
-  const ZKVERIFY_CONTRACT_ADDRESS = "0x82941a739E74eBFaC72D0d0f8E81B1Dac2f586D5"
-  const ETH_SECRET_KEY = process.env.ETH_SECRET_KEY
-  console.log(String(ZKV_RPC_URL))
+  const ZKV_RPC_URL = process.env.REACT_APP_ZKV_RPC_URL;
+  const ETH_RPC_URL = process.env.REACT_APP_ETH_RPC_URL;
+  const ZKVERIFY_CONTRACT_ADDRESS =
+    process.env.REACT_APP_ZKVERIFY_CONTRACT_ADDRESS;
+  const ETH_SECRET_KEY = process.env.REACT_APP_ETH_SECRET_KEY;
+  console.log("sending zkvSession request");
 
   let vk;
-  if (method == "contribute") 
-  {
+  if (method == "contribute") {
     const res = await fetch("/zk/whitelist_verification_key.json");
     vk = await res.json();
-  }
-  else
-  {
+  } else {
     const res = await fetch("/zk/contribution_verification_key.json");
     vk = await res.json();
   }
@@ -39,13 +36,13 @@ const zkVerifyAndCallMethod = async (
   const body = {
     vk,
     proof,
-    publicSignals
-  }
+    publicSignals,
+  };
 
   const res = await axios.post(zkvSessionUrl, body);
-  const {attestationId, leafDigest, leafIndex, merkleProof, numberOfLeaves} = res.data;
-  console.log("attestationId: ", attestationId)
-  //const attestationId = 44307;
+  const { attestationId, leafDigest, leafIndex, merkleProof, numberOfLeaves } =
+    res.data;
+  console.log("attestationId: ", attestationId);
 
   const zkvABI = [
     "event AttestationPosted(uint256 indexed _attestationId, bytes32 indexed _proofsAttestation)",
@@ -57,9 +54,9 @@ const zkVerifyAndCallMethod = async (
   const metamaskProvider = new ethers.BrowserProvider(window.ethereum);
   metamaskProvider.send("eth_requestAccounts", []);
   const addresses = await metamaskProvider.listAccounts();
-    const address = addresses[0].address;
+  const address = addresses[0].address;
   const signer = await metamaskProvider.getSigner();
-  console.log(signer)
+  console.log(signer);
 
   const zkvContract = new ethers.Contract(
     ZKVERIFY_CONTRACT_ADDRESS,
@@ -72,7 +69,7 @@ const zkVerifyAndCallMethod = async (
     attestationId,
     null
   );
-  console.log(filterAttestationsById)
+  console.log(filterAttestationsById);
 
   if (method == "claim") {
     zkvContract.once(filterAttestationsById, async () => {
@@ -83,84 +80,70 @@ const zkVerifyAndCallMethod = async (
         merkleProof,
         numberOfLeaves,
         leafIndex,
-        5
+        commitment
       );
-      console.log("claim method called")
+      console.log("claim method called");
     });
 
     const filterAppEventsByCaller = appContract.filters.Claimed(
       commitment,
-      amount
+      contributionCommitment
     );
-    appContract.once(filterAppEventsByCaller, async () => {
-      console.log(
-        `${amount} token(s) have been cliamed by user with commitment ${commitment}`
-      );
+    //appContract.once(filterAppEventsByCaller, async () => {
+    console.log(
+      `${amount} token(s) have been cliamed by user with commitment ${commitment}`
+    );
 
-      // get the token address, create token contract and transfer amount tokens to the user's address
-      const url = "http://localhost:8000/api/details";
-      const body = { symbol: symbol };
-      const resp = await axios.get(url, body);
-      const tokenAddress = resp.data.tokenDetails.address;
-      const tokenABI = ["function transferTokens(address recipient, uint256 amount)"];
-      const wallet = new ethers.Wallet(ETH_SECRET_KEY, provider);
-      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, wallet);
+    // get the token address, create token contract and transfer amount tokens to the user's address
+    const url = `http://localhost:8000/api/details?symbol=${symbol}`;
+    const resp = await axios.get(url);
+    const tokenAddress = resp.data.tokenDetails.address;
+    const tokenABI = [
+      "function transferTokens(address recipient, uint256 amount)",
+    ];
+    const wallet = new ethers.Wallet(ETH_SECRET_KEY, provider);
+    const tokenContract = new ethers.Contract(tokenAddress, tokenABI, wallet);
 
-      // calculate the amount of tokens to be transferred 
-      const totalContrib = await appContract.getTotalContrib();
-      const totalSupply = await appContract.getTotalSupply();
-      const amountTokens = (amount * totalSupply) / totalContrib;
-      const txResponse = await tokenContract.transferTokens(address, amountTokens);
-      const { hash } = await txResponse;
-      console.log(`Tx sent to EVM, tx-hash ${hash}`);
-      console.log(`Tokens have been transferred to user's address`);
-    });
+    // calculate the amount of tokens to be transferred
+    const totalContrib = await appContract.getTotalContrib();
+    const totalSupply = await appContract.getTotalSupply();
+    const amountTokens = (amount * totalSupply) / totalContrib;
+    await tokenContract.transferTokens(address, amountTokens);
+
+    console.log(`Tokens have been transferred to user's address`);
+    //});
   }
 
   if (method == "contribute") {
-    console.log("inside contribute")
+    console.log("inside contribute");
     zkvContract.once(filterAttestationsById, async (_id, _root) => {
-      // const merkleProof = ["0x2f925aed2090b47c5fa88c97d804b1505f56e31f19a4da4c29bed78a25e99927"]
-      // const numberOfLeaves = 2;
-      // const leafIndex = 0;
-      // console.log("calling contribute")
-      // console.log("commitment: ", commitment)
-      // console.log("root: ", root)
-      console.log(commitment)
-      console.log(attestationId)
-      console.log(merkleProof)
-      console.log(numberOfLeaves)
-      console.log(leafIndex)
-      console.log(root)
-      console.log("sending transaction")
-      console.log(amount)
-      await appContract.contribute(
+      console.log("sending transaction");
+      await appContract.conribute(
         commitment,
         attestationId,
         merkleProof,
         numberOfLeaves,
         leafIndex,
-        root,
-        {value: amount, gasLimit: 3000000}
+        commitment,
+        { value: amount, gasLimit: 500000 }
       );
-      // const { hash } = await txResponse;
-      // console.log(`Tx sent to EVM, tx-hash ${hash}`);
-      console.log("method called")
+
+      console.log("Contribution method called");
     });
 
     const filterAppEventsByCaller = appContract.filters.Contributed(
       commitment,
       null
     );
-    appContract.once(filterAppEventsByCaller, async () => {
-      const url = "http://localhost:8000/api/contributor";
-      const body = { contributor: contributionCommitment };
+    const url = "http://localhost:8000/api/contributor";
+    const body = { contributor: contributionCommitment, symbol: symbol };
 
-      await axios.post(url, body);
+    await axios.post(url, body);
+    setTimeout(async () => {
       console.log(
         `Whitelist inclusion has been proved and contribution of amount ${amount} has been made`
       );
-    });
+    }, 40000);
   }
 };
 
