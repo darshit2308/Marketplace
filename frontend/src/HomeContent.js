@@ -33,24 +33,24 @@ const HomeContent = () => {
   const teamMembers = [
     {
       name: "Ankit Baidsen",
-      role: "Blockchain Developer",
-      image: "/image1.jpeg",
+      role: "Blockchain/Backend Developer",
+      image: "/image1.png",
       description:
-        "5+ years of experience in blockchain development and smart contract implementation.",
+        "Specializes in developing clean and efficient smart contracts and integrating them with dApps",
     },
     {
       name: "Darshit Khandelwal",
       role: "Fullstack Developer",
-      image: "/image2.jpeg",
+      image: "/image2.png",
       description:
-        "Specialized in cryptography and blockchain security protocols.",
+        "Fullstack developer, experienced in developing a variety of web applications",
     },
     {
       name: "Ritesh Pandit",
       role: "Full Stack Developer",
-      image: "/image3.jpeg",
+      image: "/image3.png",
       description:
-        "Expert in building scalable blockchain applications and user interfaces.",
+        "Designed multiple UIs, bringing web pages to life with his creativity and skills",
     },
   ];
 
@@ -75,8 +75,7 @@ const HomeContent = () => {
         <h2>Meet Our Team</h2>
         <p className="team-description">
           Built by a team of hackathon enthusiasts, our project leverages
-          blockchain technology to provide secure, transparent, and
-          decentralized transactions.
+          zero-knowledge to provide a secure and anonymous token launchpad.
         </p>
         <div className="team-grid">
           {teamMembers.map((member, index) => (

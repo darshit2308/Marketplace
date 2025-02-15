@@ -128,13 +128,13 @@ const Footer = () => {
   const teamMembers = [
     {
       name: "Ankit Baidsen",
-      role: "Blockchain Developer",
+      role: "Blockchain/Backend Dev",
       github: "https://github.com/neetance",
       linkedin: "https://linkedin.com/in/ankit-baidsen-202106290/",
     },
     {
       name: "Darshit Khandelwal",
-      role: "Blockchain Dev/Backend dev",
+      role: "Fullstack Developer",
       github: "https://github.com/darshit2308",
       linkedin: "https://www.linkedin.com/in/darshit-khandelwal-49bb25288/",
     },
@@ -207,16 +207,16 @@ const Footer = () => {
           <div className="footer-section">
             <h3>About VeilPad</h3>
             <p>
-              Building the future of decentralized finance through secure
-              blockchain solutions.
+              Revolutionising token launchpads and marketplaces with
+              zero-knowledge
             </p>
-            <p>Launching March 2025</p>
+            <p></p>
           </div>
         </div>
 
         {/* Bottom Section */}
         <div className="footer-bottom">
-          <p>Built with React, Solidity, and ❤️</p>
+          <p>Built with React, Solidity, and ZKVerify</p>
           <p>© 2025 VeilPad. All rights reserved.</p>
         </div>
       </div>
